@@ -1,0 +1,7 @@
+polkit.addRule(function (action, subject) {
+    if (action.id === "com.nymvpn.vpnd.unix" ||
+        action.id === "com.nymvpn.vpnd.tamp" ||
+        action.id === "com.nymvpn.vpnd.cancel") {
+        return polkit.Result.YES;
+    }
+});

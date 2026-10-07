@@ -1,0 +1,10 @@
+FROM tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065
+
+# L'image officielle pointe /usr/sbin/iptables vers iptables-legacy. Le noyau
+# 6.18.53-0-lts d'Alpine compile le support iptables en dur et ne fournit aucun
+# module ip_tables, donc legacy echoue toujours avec "Table does not exist".
+# tailscaled ne sait pas choisir son backend en ligne de commande. On le force
+# sur nft, que l'image embarque deja et que le noyau supporte.
+RUN ln -sf /usr/sbin/iptables-nft /usr/sbin/iptables && \
+    ln -sf /usr/sbin/ip6tables-nft /usr/sbin/ip6tables && \
+    iptables --version
