@@ -5,6 +5,7 @@
 # Aucun nom de conteneur n est utilise comme motif de suppression.
 #
 # Connexion : ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>
+# Copiez ce fichier sur le serveur, par exemple dans /tmp :
 # Puis :      sh /tmp/verif-adguard.sh
 #
 # doas reclame un tty et le mot de passe. Lance ce script depuis une vraie

@@ -29,7 +29,7 @@ Chaque fichier a un axe. Pour trouver une information, ouvrez le fichier de l'ax
 | `runbook.md` | Passé | Les incidents, les diagnostics, les pièges |
 | `todo.md` | Futur | Les tâches restantes et les cas conditionnels |
 
-La section « L'état réel de la machine » de `architecture.md` est la source de vérité. Elle prime sur les six autres fichiers. Vérifiez-la avant d'agir, car elle peut être périmée. Tout le reste est une intention, une décision ou une archive. Une case cochée décrit un travail fait. Elle ne prouve pas que l'objet existe encore.
+La section « L'état réel de la machine » de `architecture.md` est la source de vérité. Elle prime sur les six autres fichiers. Tout le reste est une intention, une décision ou une archive.
 
 ## État global
 
@@ -39,8 +39,9 @@ Mettez à jour ce tableau après chaque étape. Les trois dernières cases sont 
 - [x] SSH accepte la clé seule. `PasswordAuthentication` vaut `no`. La connexion root est désactivée.
 - [x] L'utilisateur `<ADMIN-ACCOUNT>` et `doas` sont configurés.
 - [x] Docker 29.5.x et compose v5.1.4 sont installés. Docker démarre au boot.
+- [x] L'Ethernet `eth0` est en service depuis le 2026-10-05, avec repli automatique sur le Wi-Fi.
 - [x] La voie 1, nommée `<OLD-SERVER-NAME>`, est construite et testée. Son identité est persistante depuis le 2026-10-03.
 - [x] La voie 2, nommée `<OLD-NODE-EXIT-NYMVPN>`, a un tunnel Nym établi. Son relais est vérifié depuis le 2026-10-03.
 - [ ] Phase C : les microservices AdGuard Home et WoL.
 - [ ] Phase D : la surveillance et les notifications ntfy.
-- [ ] Le repo GitHub privé et le README.
+- [ ] Le repo GitHub privé. `readme.md` en sera la page d'accueil.

@@ -4,7 +4,7 @@ Ce fichier décrit ce qui existe aujourd'hui et la façon dont c'est construit. 
 
 ## L'état réel de la machine
 
-Cette section décrit ce qui existe réellement sur le serveur. Elle a été vérifiée le 2026-10-03. Elle prime sur les six autres fichiers. Vérifiez-la avant d'agir, car elle peut être périmée.
+Cette section décrit ce qui existe réellement sur le serveur. Elle a été vérifiée entre le 2026-10-03 et le 2026-10-08. Elle prime sur les six autres fichiers. Vérifiez-la avant d'agir, car elle peut être périmée.
 
 | Élément | État | Emplacement |
 |---|---|---|
@@ -22,8 +22,10 @@ Cette section décrit ce qui existe réellement sur le serveur. Elle a été vé
 | `ethtool` 7.0 et `ifupdown-ng-ethtool` | installés le 2026-10-05, binaires de diagnostic | aucun |
 | `uplink-guard`, épinglage de la passerelle | en service le 2026-10-05, supervisé, runlevel `default` | `/usr/local/bin/uplink-guard`, `/etc/init.d/uplink-guard` |
 | Sauvegardes de la configuration réseau | présentes | `/etc/network/interfaces.bak.202610052234`, `.bak.202610052137` |
+| Écoute SSH | `0.0.0.0:22`, en attente de durcissement | `/etc/ssh/sshd_config` |
+| Batterie | gonflée, châssis déformé, débranchement planifié | aucun |
 
-La partie réseau a été réévaluée le 2026-10-05. Le récit et les mesures sont dans `runbook.md`, section « Le diagnostic du 2026-10-05 ».
+La partie réseau a été réévaluée le 2026-10-05. Le récit et les mesures sont dans `runbook.md`, section « Le diagnostic du 2026-10-05 : la mise en service de l'Ethernet ».
 
 Les deux voies vivent sur le même hôte. La voie 1 tourne dans le réseau de l'hôte. La voie 2 tourne dans un espace réseau dédié. Le conteneur `<OLD-NETNS>` tient cet espace. Un redémarrage de l'hôte remet les deux voies en ligne sans intervention. Les conteneurs portent `restart: unless-stopped`. Les identités vivent dans des volumes.
 
@@ -74,7 +76,7 @@ Un microservice choisit sa sortie avec le paramètre `--exit-node` de son `tails
 
 - Le projet compose `/opt/tailscale` existe. Son image est épinglée, `tailscale/tailscale@sha256:c507…`. Le service utilise `network_mode: host`, les capacités `NET_ADMIN` et `NET_RAW`, et `/dev/net/tun`. Il porte le volume `state` et `restart: unless-stopped`.
 - Le nœud `<OLD-SERVER-NAME>` est enregistré en `<TAILNET-IP-EXIT-DIRECT>`. `TS_STATE_DIR` vaut `/var/lib/tailscale` depuis le 2026-10-03. L'identité survit donc à un redémarrage.
-- La clé d'authentification vit dans `/opt/tailscale/.env`, en mode `600`.
+- Le fichier `/opt/tailscale/.env` est en mode `600`. La clé qu'il contenait a été retirée le 2026-10-03, avec sa référence dans le compose. Vérifié le 2026-10-08 : la variable `TS_AUTHKEY` est vide.
 - L'exit node est approuvé dans la console d'administration Tailscale.
 - Le test de bout en bout est fait : depuis l'iPhone, choisissez `<OLD-SERVER-NAME>`, puis ouvrez `https://api.ipify.org`. L'adresse affichée est celle de la `<ISP-BOX>`, `<WAN-IP-BOX-B>` au 2026-10-03.
 
@@ -108,6 +110,8 @@ Le conteneur dédié évite un piège. Un espace réseau appartient au conteneur
              table 333, dev tun0
 ```
 
+Le `eth0` du schéma est celui du conteneur, en `<DOCKER-INTERNAL-IP>`. L'`eth0` de l'hôte est l'adaptateur filaire, en `<LAN-IP-SERVER>`.
+
 Le trafic des appareils arrive sur `tailscale0`. Il n'est pas marqué. La règle `not from all fwmark 0x14d lookup 333` l'envoie dans la table 333. La route par défaut de la table 333 pointe sur `tun0`. Le trafic marqué de Tailscale, `0x80000`, saute cette règle. Il sort par `eth0`, ce qui évite la boucle.
 
 `<OLD-NODE-EXIT-NYMVPN>` utilise le mode noyau, `TS_USERSPACE=false`. En mode espace utilisateur, Tailscale marque ses paquets avec `0x80000`. Le client Nym marque aussi ses propres sockets avec `0x14d`. Les deux marques peuvent se confondre. Le trafic peut alors repartir par la table principale. Le mode noyau évite cette ambiguïté.
@@ -122,9 +126,12 @@ Le projet compose vit dans `/opt/tailscale-nym`, répertoire root, avec le fichi
 | `Dockerfile.tailscale` | Image Tailscale dérivée, qui force le backend iptables sur nft |
 | `nym-entrypoint.sh` | Dbus, polkit, `nym-vpnd`, puis le superviseur de connexion |
 | `49-nymvpn.rules` | Règle polkit qui autorise les actions Nym sur le socket local |
-| `docker-compose.yaml` | Les deux services, l'espace réseau partagé, les sysctl |
-| `.env` | La clé Tailscale, mode `600`, jamais dans le repo |
-| `etc-nym/nym-vpnd.json` | Configuration Nym générée et persistée |
+| `docker-compose.yaml` | Les trois services, l'espace réseau partagé, les sysctl |
+| `.env` | Le fichier de secrets, mode `600`, absent du repo, sur le serveur |
+| `etc-nym/nym-vpnd.json` | Configuration Nym générée et persistée, sur le serveur, hors repo |
+| `loop.sh` | Le test de relais entre les deux voies, exécuté sur le Mac |
+| `test-client.sh` | Le lancement du conteneur de test `ts-client` sur le Mac |
+| `.env.example` | Le gabarit des variables, versionné dans le repo |
 
 Il n'existe pas d'image Nym officielle pour Linux. L'image est construite localement à partir de Debian bookworm, car le client officiel ne fournit que des paquets macOS. La version `2026.12.4` est la dernière qui livre des binaires Linux. Le tarball est vérifié par SHA-256 avant extraction.
 
@@ -158,7 +165,7 @@ table 1000 : default via <gw> dev eth0
 table   52 : les pairs du tailnet, dev tailscale0
 ```
 
-Quatre blocs se lisent de haut en bas. Le superviseur place la règle de retour, puis sa règle d'accès direct. Nym place ses deux règles. Tailscale place les siennes. Le superviseur lit la position réelle de Nym. Il se met juste au-dessus. L'ordre tient donc même quand Nym se décale.
+Quatre blocs se lisent de haut en bas. Le superviseur place la règle de retour, puis sa règle d'accès direct. Nym place ses deux règles. Tailscale place les siennes. Le superviseur lit la priorité réelle de Nym. Il prend une priorité plus basse, donc ses règles passent avant celles de Nym. L'ordre tient même quand Nym se décale.
 
 La table 52 ne contient que des routes vers les pairs. Elle ne contient aucune route de rejet `0.0.0.0/1`. Un client qui demande une adresse publique ne trouve donc rien dans la table 52. Son trafic retombe sur la règle `not from all fwmark 0x14d lookup 333`, donc dans le tunnel. Ce comportement est voulu. Vérifiez-le après chaque mise à jour de Tailscale. Une route de rejet dans la table 52 noierait tout le trafic sans message d'erreur.
 
@@ -170,15 +177,15 @@ La règle `not from all fwmark 0x14d lookup 333` appartient à Nym. Elle envoie 
 
 La règle `from all lookup main suppress_prefixlength 0` masque la route par défaut de la table principale. Le trafic non marqué ne peut donc pas atteindre `eth0` par la route par défaut. Si le tunnel tombe, le trafic est perdu au lieu de repartir en direct. Ce comportement fail-closed est voulu. Vérifiez-le avec `ip route get 8.8.8.8` dans le conteneur. La réponse doit mentionner `tun0` et la table 333.
 
-`tailscaled` utilise deux marques distinctes. Il faut les connaître pour raisonner. Son propre trafic porte `0x80000`. Cette marque couvre le contrôle, les relais DERP et les échanges WireGuard entre pairs. La règle du superviseur l'envoie en direct par `eth0`. Le trafic relayé des clients porte `0x40000`. Cette marque ne correspond pas au masque `0xff0000`. Le trafic des clients échappe donc à la règle du superviseur. Il suit le chemin normal. La règle 5270 ne trouve rien dans la table 52 pour une adresse publique. La règle de Nym l'envoie ensuite dans la table 333. Vérifiez ce chemin après toute mise à jour de Tailscale avec `ip route get 9.9.9.9 from <TAILNET-IP-EXIT-NYMVPN> mark 0x40000`. La réponse doit mentionner `tun0` et la table 333.
+`tailscaled` utilise deux marques distinctes. Il faut les connaître pour raisonner. Son propre trafic porte `0x80000`. Cette marque couvre le contrôle, les relais DERP et les échanges WireGuard entre pairs. La règle du superviseur l'envoie en direct par `eth0`. Le trafic relayé des clients porte `0x40000`. Cette marque ne vaut pas `0x80000`, donc la règle `fwmark 0x80000/0xff0000` ne la prend pas. Le trafic des clients échappe donc à la règle du superviseur. Il suit le chemin normal. La règle 5270 ne trouve rien dans la table 52 pour une adresse publique. La règle de Nym l'envoie ensuite dans la table 333. Vérifiez ce chemin après toute mise à jour de Tailscale avec `ip route get 9.9.9.9 from <TAILNET-IP-EXIT-NYMVPN> mark 0x40000`. La réponse doit mentionner `tun0` et la table 333.
 
-Le superviseur pose deux règles. Nym installe ses règles juste avant celles de Tailscale. Il les décale à chaque connexion. Une priorité fixe ne tiendrait donc pas. Le superviseur lit la priorité réelle de Nym, puis il se place deux unités en dessous. Il range la route directe dans la table 1000 :
+Le superviseur pose deux règles. Nym installe ses règles juste avant celles de Tailscale. Il les décale à chaque connexion. Une priorité fixe ne tiendrait donc pas. Le superviseur lit la priorité réelle de Nym, puis il prend les priorités `n-1` et `n-2`. Une priorité plus basse est évaluée en premier. Il range la route directe dans la table 1000 :
 
 ```
 ip rule add priority <n-1> fwmark 0x80000/0xff0000 lookup 1000
 ```
 
-Le trafic marqué sort alors par `oif "eth0"`. La chaîne `output` de Nym accepte ce chemin. Aucun bistouri n'est nécessaire sur le pare-feu de Nym. Le superviseur repose la règle à chaque boucle, parce que Nym reconstruit ses chaînes et ses règles.
+Le trafic marqué sort alors par `oif "eth0"`. La chaîne `output` de Nym accepte ce chemin. Aucun bistouri n'est nécessaire sur le pare-feu de Nym. Le superviseur repose la règle quand elle manque, parce que Nym reconstruit ses chaînes et ses règles.
 
 La seconde règle renvoie vers `tailscale0` la réponse qui arrive du tunnel à destination d'un client :
 
@@ -198,6 +205,8 @@ Nym installe une table `inet nym` avec `policy drop` sur les chaînes `input`, `
 chain output  { policy drop; udp dport 53 reject; tcp dport 53 reject with tcp reset; reject; }
 chain forward { policy drop; udp dport 53 reject; tcp dport 53 reject with tcp reset; reject; }
 ```
+
+Ce bloc montre seulement le rejet de fin. La chaîne accepte aussi `oif "tun0"` et les passerelles de Nym.
 
 Le résolveur interne de Nym répond. Le port 53 vers l'extérieur est refusé par le noyau. Le noyau renvoie une erreur à l'appelant. N'attendez pas d'absence de réponse. Une absence de réponse signifierait un blocage silencieux.
 
@@ -230,7 +239,7 @@ Ce glossaire définit les termes du projet. Chaque terme est défini une seule f
 | Étiquette de paquet, `fwmark` | Une marque appliquée à un paquet. Un anonymiseur peut étiqueter son propre trafic pour qu'il n'entre pas dans son tunnel. |
 | Route par défaut | Une règle de secours qui envoie tout le trafic non prévu vers une seule porte. Une route par défaut pointée sur un tunnel coupe toute fuite. |
 | Conteneur compagnon, sidecar | Un conteneur qui fournit un service à un autre conteneur. Ici, `tailscaled` accompagne l'application. |
-| `--accept-routes=true` | Le drapeau qui autorise un nœud à suivre la route d'un exit node. Sans ce drapeau, la bascule reste sans effet. |
+| `--accept-routes=true` | Le drapeau qui autorise un nœud à suivre la route d'un exit node. |
 | DERP | Le relais de secours de Tailscale. Il utilise HTTPS sur le port 443. Tailscale l'emploie quand la connexion directe entre deux nœuds est bloquée. |
 | MTU | La taille maximale d'un paquet. Deux tunnels empilés imposent une valeur plus petite que celle du tunnel extérieur. |
 | Anonymiseur | Un service qui relaie le trafic vers Internet en cachant l'adresse d'origine. L'anonymiseur de la voie 2 est Nym, en mode fast. |
@@ -238,3 +247,8 @@ Ce glossaire définit les termes du projet. Chaque terme est défini une seule f
 | Mode fast | Un trajet en deux sauts, une passerelle d'entrée puis une passerelle de sortie. L'adresse de sortie visible change selon la passerelle sélectionnée. |
 | `.env` | Le fichier de secrets lu par compose. Le fichier reste absent du repo. Le fichier `.env.example` sert de gabarit. |
 | Full-tunnel | Une configuration où tout le trafic non étiqueté passe par le tunnel. |
+| `<ISP-BOX>` | La box du fournisseur d'accès. Elle est la passerelle du réseau local, `<LAN-GATEWAY-IP>`, et elle porte l'adresse publique de la voie 1. |
+| WoL | Le réveil d'un ordinateur à distance, envoyé par le réseau local. |
+| MagicDNS | Le résolveur de Tailscale. Il répond en `100.100.100.100` et il résout les noms des nœuds du tailnet. |
+| fail-closed | Le comportement d'un tunnel qui perd le trafic au lieu de le laisser partir en direct. |
+| supervise-daemon | Le superviseur de services d'OpenRC. Il relance un service qui s'arrête. |

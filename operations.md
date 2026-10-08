@@ -16,18 +16,20 @@ L'adresse `<LAN-IP-WIFI>` est l'adresse du réseau local. Elle fonctionne depuis
 
 Si vous lancez `docker compose up -d` sans argument après un build, Compose recréerait `<OLD-NETNS>`. Son image est partagée avec `nym`. L'espace réseau serait perdu. Utilisez `--no-deps`, qui ne recrée que `nym`.
 
+Copiez les sources du dépôt vers le serveur, à la main, avec `scp` ou `rsync`.
+
 Ces commandes s'exécutent sur `<OLD-SERVER-NAME>`, avec `doas` :
 
 ```sh
 cd /opt/tailscale-nym
-docker compose build nym
-docker compose up -d --no-deps nym
+doas docker compose build nym
+doas docker compose up -d --no-deps nym
 ```
 
-Si la pile est arrêtée, lancez `docker compose up -d` une fois. Relisez ensuite l'identifiant de l'espace avec cette commande :
+Si la pile est arrêtée, lancez `doas docker compose up -d` une fois. Relisez ensuite l'identifiant de l'espace avec cette commande :
 
 ```sh
-docker inspect -f '{{.NetworkSettings.SandboxKey}}' <OLD-NETNS>
+doas docker inspect -f '{{.NetworkSettings.SandboxKey}}' <OLD-NETNS>
 ```
 
 ## L'état de la voie 2
@@ -35,14 +37,14 @@ docker inspect -f '{{.NetworkSettings.SandboxKey}}' <OLD-NETNS>
 Ces commandes donnent l'état du tunnel et l'état du routage :
 
 ```sh
-docker exec nym nym-vpnc status --table-style blank
-docker exec nym sh -c 'curl -s --max-time 20 https://api.ipify.org; echo'
-docker exec nym ip rule
-docker exec nym ip route show table 333
-docker logs nym | grep superviseur
+doas docker exec nym nym-vpnc status --table-style blank
+doas docker exec nym sh -c 'curl -s --max-time 20 https://api.ipify.org; echo'
+doas docker exec nym ip rule
+doas docker exec nym ip route show table 333
+doas docker logs nym | grep superviseur
 ```
 
-Ne lancez jamais `nym-vpnd -v`. La règle et sa raison sont dans `guidelines.md`. Pour raisonner sur le routage, lisez « Routage mesuré » dans `architecture.md`.
+Ne lancez jamais `nym-vpnd -v`. La règle et sa raison sont dans `guidelines.md`. Pour raisonner sur le routage, lisez « Le routage mesuré » dans `architecture.md`.
 
 ## La sortie d'un microservice
 
@@ -54,7 +56,7 @@ doas docker exec <service> tailscale set --exit-node=<OLD-SERVER-NAME>       # d
 doas docker exec <service> tailscale set --exit-node=none       # pas d'exit node
 ```
 
-Vérifiez la sortie active avec `tailscale status`. La console Tailscale affiche aussi la sortie de chaque nœud. Vous pouvez créer un alias court pour chaque service.
+Vérifiez la sortie active avec `doas docker exec <service> tailscale status`. La console Tailscale affiche aussi la sortie de chaque nœud. Vous pouvez créer un alias court pour chaque service.
 
 ## Le redémarrage de l'hôte
 
@@ -65,10 +67,10 @@ Attendez une minute après le reboot, puis lancez ces commandes :
 ```sh
 doas docker ps -a --format '{{.Names}} {{.Status}}'
 doas docker exec <OLD-NODE-EXIT-NYMVPN> tailscale ip -4
-doas docker logs nym | grep -E 'New tunnel state|superviseur'
+doas docker logs nym | grep superviseur
 ```
 
-Attendu : les quatre conteneurs sont `Up`. `<OLD-SERVER-NAME>` garde `<TAILNET-IP-EXIT-DIRECT>`. `<OLD-NODE-EXIT-NYMVPN>` garde `<TAILNET-IP-EXIT-NYMVPN>`. Le journal montre une reconnexion du tunnel Nym.
+Attendu : les quatre conteneurs sont `Up`. `<OLD-SERVER-NAME>` garde `<TAILNET-IP-EXIT-DIRECT>`. `<OLD-NODE-EXIT-NYMVPN>` garde `<TAILNET-IP-EXIT-NYMVPN>`. Le superviseur journalise la reconnexion du tunnel Nym.
 
 ## La maintenance
 
@@ -82,9 +84,9 @@ doas apk update && doas apk upgrade
 
 Redémarrez le serveur si le noyau a changé. Le module `tun` se recharge au boot. Docker redémarre avec lui.
 
-Pour `<OLD-SERVER-NAME>`, changez l'image par digest dans `/opt/tailscale`. Lancez `docker compose pull`, puis `up -d --force-recreate`. L'état du nœud reste dans le volume `state`.
+Pour `<OLD-SERVER-NAME>`, changez l'image par digest dans `/opt/tailscale`. Lancez `doas docker compose pull`, puis `doas docker compose up -d --force-recreate`. L'état du nœud reste dans le volume `state`.
 
-Pour `<OLD-NODE-EXIT-NYMVPN>`, l'image Nym est construite localement. Après une modification des sources, lancez `docker compose build nym` dans `/opt/tailscale-nym`. Puis lancez `docker compose up -d --no-deps nym`. Ne recréez pas `<OLD-NETNS>` seul, car son espace réseau héberge `nym` et `<OLD-NODE-EXIT-NYMVPN>`.
+Pour `<OLD-NODE-EXIT-NYMVPN>`, l'image Nym est construite localement. Après une modification des sources dans le dépôt, copiez-les sur le serveur, puis lancez `doas docker compose build nym` dans `/opt/tailscale-nym`. Puis lancez `doas docker compose up -d --no-deps nym`. Ne recréez pas `<OLD-NETNS>` seul, car son espace réseau héberge `nym` et `<OLD-NODE-EXIT-NYMVPN>`.
 
 Les clients du tailnet se mettent à jour depuis l'App Store ou le magasin d'applications. Aucune action n'est nécessaire sur le serveur. N'écrivez pas de script unique avant d'avoir assez de projets.
 
@@ -99,8 +101,8 @@ Colima et Docker servaient de client Tailscale de test sur le Mac. Ils ne toucha
 ```sh
 docker rm -f ts-client
 colima stop
-brew uninstall colima docker lima
 colima delete          # supprime la machine virtuelle et ses volumes
+brew uninstall colima docker lima
 ```
 
 Le conteneur de test `ts-client` utilise l'image `tailscale/tailscale:stable`. Depuis le 2026-10-03, cette image est basée sur Alpine 3.22.6. Elle ne contient ni `curl` ni `dig`, dont `loop.sh` a besoin. Depuis la même date, `loop.sh` installe les deux outils lui-même. Il vérifie la présence du conteneur `ts-client`, puis il lance `apk add --no-cache curl bind-tools`. Si cette installation automatique échoue, gardez la commande manuelle :

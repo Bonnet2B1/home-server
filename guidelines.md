@@ -10,7 +10,7 @@ Lisez ce fichier avant d'agir.
 - Chaque service vit dans `/opt/<service>`. Le répertoire appartient à root.
 - Chaque projet compose possède son propre fichier `.env`.
 - Le fichier `.env` est en mode `600`. Il reste hors du repo. Le fichier `.env.example` est le gabarit. Le `.gitignore` reste strict.
-- Chaque image Docker est épinglée par digest. N'utilisez jamais `latest` sans vérification.
+- Chaque image distante est épinglée par digest. Les images locales sont épinglées par version. N'utilisez jamais `latest` sans vérification.
 - Chaque conteneur qui doit survivre à un redémarrage porte `restart: unless-stopped`.
 - Les services restent accessibles par le tailnet seulement.
 - N'écrivez pas de script unique avant d'avoir assez de projets. Un script demande sa propre maintenance.
@@ -27,7 +27,7 @@ Lisez ce fichier avant d'agir.
 ## Docker
 
 - Ne lancez jamais `docker rm -f` avec un motif de nom. Ciblez le nom exact du conteneur. Ou laissez `docker compose down` agir projet par projet.
-- Les deux voies vivent sur le même hôte. Un motif de nom commun frappe les deux voies. L'incident du 2026-10-01 est dans `runbook.md`, section « L'incident du 2026-10-01 ».
+- Les deux voies vivent sur le même hôte. Un motif de nom commun frappe les deux voies. L'incident du 2026-10-01 est dans `runbook.md`, section « L'incident du 2026-10-01 : la perte de l'accès à la voie 1 ».
 - Après un rebuild de `nym`, ne lancez pas `docker compose up -d` sans argument. Utilisez `docker compose up -d --no-deps nym`. La raison de cette règle est dans `operations.md`.
 - Ne recréez jamais `<OLD-NETNS>` seul. Recréez aussi `nym` et `<OLD-NODE-EXIT-NYMVPN>`, car l'espace réseau appartient à `<OLD-NETNS>`.
 

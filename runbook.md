@@ -1,6 +1,6 @@
 # Runbook : les événements passés
 
-Ce fichier raconte ce qui s'est passé sur le serveur. Il contient les incidents, les diagnostics et les pièges. L'état actuel de la machine est dans `architecture.md`. Les tâches restantes sont dans `todo.md`. Une case cochée décrit un travail fait. Elle ne prouve pas que l'objet existe encore.
+Ce fichier raconte ce qui s'est passé sur le serveur. Il contient les incidents, les diagnostics et les pièges. L'état actuel de la machine est dans `architecture.md`. Les tâches restantes sont dans `todo.md`.
 
 ## L'incident du 2026-10-01 : la perte de l'accès à la voie 1
 
@@ -10,7 +10,7 @@ L'agent a détruit l'accès au serveur. Pendant le nettoyage de la voie 2, il a 
 docker ps -a --format "{{.Names}}" | grep -Ei "nym|netns|tailscale" | while read n; do docker rm -f "$n"; done
 ```
 
-Le motif `tailscale` a matché le conteneur de la voie 1, `tailscale`, dans `/opt/tailscale`, et l'a supprimé. Ce conteneur était la seule voie d'accès. Le SSH passe par le tailnet, jamais par le réseau local. L'utilisateur n'avait aucun accès physique. Le reboot n'a pas rétabli le nœud.
+Le motif `tailscale` a matché le conteneur de la voie 1, `tailscale`, dans `/opt/tailscale`, et l'a supprimé. Ce conteneur était la seule voie d'accès. L'utilisateur travaillait par le tailnet et n'avait aucun accès sur place. Le reboot n'a pas rétabli le nœud.
 
 État au 2026-10-01 :
 
@@ -26,7 +26,7 @@ Ces étapes reprennent l'accès, avec un accès physique ou distant :
 1. Lisez `docker ps -a` et le STATUS réel du conteneur.
 2. Lisez les journaux du projet avec `cd /opt/tailscale && docker compose logs --tail 80`. Cherchez `NeedsLogin`, `network is unreachable`, `no such host` ou un `panic`.
 3. Vérifiez la route et le DNS de l'hôte : `ip -4 route`, `cat /etc/resolv.conf`, `ping -c2 1.1.1.1`.
-4. Si `/etc/resolv.conf` pointe vers `100.100.100.100`, remettez-le sur un résolveur public.
+4. Si `/etc/resolv.conf` de l'hôte pointe vers `100.100.100.100`, remettez-le sur un résolveur public.
 5. Recréez le conteneur avec `cd /opt/tailscale && docker compose up -d --force-recreate`. L'état du nœud vit dans le volume `state` et survit.
 
 Leçon : la voie 1 et la voie 2 vivent sur le même hôte. Un motif de nom commun frappe les deux. La règle qui en découle est dans `guidelines.md`, section « Docker ».
@@ -49,7 +49,7 @@ L'ancien nœud `<OLD-SERVER-NAME>` a été supprimé dans la console. Le nouveau
 
 ## La validation des deux voies, 2026-10-03
 
-Les deux voies ont été validées le 2026-10-03. La liste ci-dessous donne les critères de réussite de la voie 2, relevés ce jour-là. Une seule case reste non cochée, et sa tâche est dans `todo.md`.
+Les deux voies ont été validées le 2026-10-03. La liste ci-dessous donne les critères de réussite, relevés ce jour-là. Une seule case reste non cochée, et sa tâche est dans `todo.md`.
 
 Critères de réussite :
 
@@ -107,11 +107,11 @@ La gigue qui en découle, mesurée vers `1.1.1.1` sur 30 paquets :
 
 Le même phénomène se voit sur le tunnel tailnet, mesuré depuis le Mac : 16,7 / 28,2 / 70,5 ms, écart-type 18 ms. C'est la plainte « ça marche à peu près », quantifiée.
 
-Deux défauts aggravants restent non corrigés. Leur détail et leur correctif sont dans `todo.md`, section « Les défauts connus, non corrigés ».
+Deux défauts aggravants, le domaine réglementaire et `wpa_supplicant`, restent non corrigés. Leur détail est dans `todo.md`, section « Les défauts connus, non corrigés ».
 
 ### La cause racine : deux interfaces sur le même subnet
 
-Une fois `eth0` monté avec son bail DHCP, la route par défaut bascule seule vers `eth0`. ifupdown-ng donne le metric 200 à un lien filaire et 300 au Wi-Fi. Le trafic sortant se met alors à perdre des paquets par bouffées : des périodes bonnes suivies de périodes à 100 % de perte.
+Une fois `eth0` monté avec son bail DHCP, la route par défaut bascule seule vers `eth0`, avec un metric plus bas que celui du Wi-Fi. Le trafic sortant se met alors à perdre des paquets par bouffées : des périodes bonnes suivies de périodes à 100 % de perte.
 
 La cause n'est pas la `<ISP-BOX>`. Elle est côté noyau. Une capture le montre :
 
@@ -170,13 +170,13 @@ La session SSH n'est pas tombée pendant les deux transitions.
 
 ### Les vérifications après correctif
 
-Depuis le serveur, le correctif donne 0 échec sur 30 tours. Le ping `8.8.8.8` montre 14,2 / 14,5 / 14,8 ms. Depuis le Mac, sur le tailnet, les valeurs sont 15,4 / 19,3 / 24,0 ms avec un écart-type de 2,0 ms. Sur Wi-Fi, elles étaient de 16,7 / 28,2 / 70,5 ms avec un écart-type de 18 ms. Le pic est donc passé de 70 ms à 24 ms.
+Depuis le serveur, le correctif donne 0 échec sur 30 tours. Le ping `8.8.8.8` montre 14,2 / 14,5 / 14,8 ms. Depuis le Mac, sur le tailnet, les valeurs sont 15,4 / 19,3 / 24,0 ms avec un écart-type de 2,0 ms. Avant le correctif, elles étaient de 16,7 / 28,2 / 70,5 ms avec un écart-type de 18 ms. Le pic est donc passé de 70 ms à 24 ms.
 
-Le redémarrage complet de l'hôte n'a pas été vérifié. Cette vérification reste à faire. Elle est dans `todo.md`, section « Les défauts connus, non corrigés ».
+Le redémarrage complet n'a pas été revérifié depuis la reconfiguration réseau du 2026-10-05. Le test du 2026-10-03 avait réussi. Cette vérification reste à faire. Elle est dans `todo.md`, section « Les défauts connus, non corrigés ».
 
 ### La fragilité indépendante, côté Mac
 
-Le diagnostic a trouvé une faiblesse indépendante, côté Mac. Les résolveurs du Mac sont ceux de MagicDNS. Toute résolution de nom dépend donc du Wi-Fi instable. Le diagnostic complet et le contournement sont dans `todo.md`, section « Les défauts connus, non corrigés ».
+Le diagnostic a trouvé une faiblesse indépendante, côté Mac. Les résolveurs du Mac sont ceux de MagicDNS. Toute résolution de nom dépend donc du Wi-Fi instable. Le contournement prévu est dans `todo.md`, section « Les défauts connus, non corrigés ».
 
 ## Les pièges de la voie 2
 
@@ -228,6 +228,8 @@ La cause est un réglage du client. L'application iOS n'activait pas son option 
 ## L'archive : les mesures de l'essai du 2026-09-29
 
 Ces mesures viennent de l'essai de la voie 2, avec l'architecture qui a échoué, et d'un tunnel Nym. Elles peuvent être fausses pour une autre architecture. Certaines peuvent venir de cette architecture plutôt que du fournisseur d'anonymisation. Utilisez-les comme des pistes, jamais comme des propriétés établies. Revalidez chaque chiffre avant de vous y fier.
+
+Le projet NymVPN a été retiré le 2026-09-29. Son répertoire `/opt/nymvpn` n'existe plus.
 
 | Mesure | Résultat observé |
 |---|---|

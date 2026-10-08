@@ -4,9 +4,9 @@ Ce fichier liste ce qui reste à faire. Chaque tâche vit à un seul endroit. Le
 
 ## La voie 2
 
-La voie 2 est en service depuis le 2026-10-03. Trois tâches restent ouvertes sur elle. La première est le test final depuis l'iPhone.
+La voie 2 est en service depuis le 2026-10-03. Trois tâches restent ouvertes sur elle. La première vérifie que la voie 1 répond encore après un passage par la voie 2.
 
-- Testez la voie 2 depuis l'iPhone avec `<OLD-NODE-EXIT-NYMVPN>` sélectionné. Vérifiez ensuite que la voie 1 répond toujours avec `<OLD-SERVER-NAME>`.
+- Vérifiez que la voie 1 répond toujours avec `<OLD-SERVER-NAME>` sélectionné, après un passage par la voie 2. Ce test est la seule case non cochée de `runbook.md`.
 - Mesurez la MTU effective sur du trafic réel. Le bug [6465](https://github.com/nymtech/nym-vpn-client/issues/6465) vise les tunnels Nym au-dessus de 1300.
 - Révoquez les clés d'authentification Tailscale dans la console. La liste des clés à révoquer est dans `operations.md`.
 
@@ -14,16 +14,16 @@ La voie 2 est en service depuis le 2026-10-03. Trois tâches restent ouvertes su
 
 Ces étapes concernent les deux voies. Elles ne font partie d'aucune phase. Deux étapes restent ouvertes.
 
-- Durcissez SSH. Le service écoute encore sur `0.0.0.0:22`. Restreignez l'écoute au tailnet après le test d'accès distant.
-- Décidez du réglage `--accept-dns`. Le réglage actuel reste à `false`, car c'est le défaut du conteneur. La décision se prend le jour de la tâche AdGuard Home. Chaque service anonymisé pointera son résolveur vers `100.100.100.100`.
+- Durcissez SSH. Le service écoute encore sur `0.0.0.0:22`. Restreignez l'écoute au tailnet après un test de SSH depuis l'extérieur du réseau local.
+- Décidez du réglage `--accept-dns`. `adguard/docker-compose.yaml` a déjà tranché pour son service : `TS_ACCEPT_DNS=false`. Sinon, le service résout son propre amont par le tailnet et la boucle ne se ferme jamais. Ce choix entre en conflit avec la règle du gabarit, le résolveur `100.100.100.100`, dans `architecture.md`. Réglez ce conflit le jour de la tâche AdGuard Home.
 
 ## Les phases restantes
 
 Trois phases restent ouvertes. `readme.md` donne leur état global. Chaque phase a sa tâche ici.
 
-- Ajoutez les microservices AdGuard Home et WoL. Le gabarit de la phase C est dans `architecture.md`.
-- Ajoutez la surveillance et les notifications avec ntfy. Une alerte signale une coupure de l'anonymiseur. Une autre alerte signale une coupure de courant.
-- Créez le repo GitHub privé et le README. Le repo contient les compose, les configurations et cette documentation.
+- Ajoutez les microservices AdGuard Home et WoL. Les sources d'AdGuard existent déjà dans `adguard/`, avec `verif.sh`. Elles ne sont pas déployées sur le serveur. Le gabarit de la phase C est dans `architecture.md`.
+- Ajoutez la surveillance et les notifications avec ntfy. Les alertes et le choix du service sont décidés dans `reasons.md`, section « Les décisions actées ».
+- Créez le repo GitHub privé. `readme.md` en est la page d'accueil. Le repo contiendra `tailscale-nym/`, `adguard/` et cette documentation.
 
 ## Les défauts connus, non corrigés
 
@@ -32,7 +32,7 @@ Cette section liste les défauts connus qui restent ouverts. Chaque défaut a un
 - `iw reg get` renvoie `country 00: DFS-UNSET`. Tous les canaux sont en `PASSIVE-SCAN`. Le domaine réglementaire n'a jamais été posé. C'est un défaut connu avec `iwlwifi`. Pour le corriger, exécutez `iw reg set FR` avec quelqu'un sur place. La commande exige une désassociation Wi-Fi.
 - `wpa_supplicant` tourne sous `supervise-daemon` avec `--respawn-max 5 --respawn-period 1800`. Au-delà de cinq redémarrages en 30 minutes, le superviseur renonce. Le serveur reste alors sans liaison Wi-Fi.
 - Les résolveurs du Mac sont `100.100.100.100` et `fd7a:115c:a1e0::53`, donc MagicDNS. Toute résolution de nom dépend du tailnet, donc du Wi-Fi instable. C'est une seconde cause de « ça marche à peu près ». Le contournement consiste à garder MagicDNS et à ajouter un résolveur public en second. Rien n'a été modifié.
-- Le redémarrage complet de l'hôte n'a pas été vérifié. La configuration est persistante et validée par `ifup -n`. Le gardien est au runlevel `default`. Le service `networking` continue la boucle si `eth0` échoue. Le risque est faible, mais l'essai reste à faire.
+- Le redémarrage complet n'a pas été revérifié depuis la reconfiguration réseau du 2026-10-05. Le test du 2026-10-03 avait réussi sur l'état d'avant. La configuration est persistante et validée par `ifup -n`. Le gardien est au runlevel `default`. Le service `networking` continue la boucle si `eth0` échoue. Le risque est faible, mais l'essai reste à faire.
 
 ## Le conditionnel
 

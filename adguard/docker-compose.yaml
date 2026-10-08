@@ -19,8 +19,8 @@ services:
   #
   # TS_ACCEPT_DNS=false est obligatoire. Sinon le service resout son propre
   # amont via le tailnet, le tailnet renvoie la requete vers ce meme service, et
-  # la boucle ne se ferme jamais. C est la reponse a la question ouverte du
-  # runbook sur --accept-dns.
+  # la boucle ne se ferme jamais. C est la reponse a la question ouverte de
+  # todo.md sur --accept-dns.
   #
   # --accept-routes=true est obligatoire pour la meme raison que sur les
   # microservices : sans lui, la route 0.0.0.0/0 de l exit node est ignoree et
