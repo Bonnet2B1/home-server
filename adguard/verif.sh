@@ -20,7 +20,7 @@ say() {
 # ---------------------------------------------------------------- A. HOTE
 
 say "A1. Image tailscale reparee presente ?"
-# Attendu : la ligne existe. C est elle qui evite le piege 5 du runbook :
+# Attendu : la ligne existe. C est elle qui evite le piege 5 de logbook.md :
 # sur le noyau Alpine, tailscaled refuse d installer ses regles de pare-feu
 # avec l image officielle, qui pointe vers iptables-legacy.
 doas docker image inspect local/tailscale-nft:1.102.5 \
@@ -103,7 +103,7 @@ doas docker exec tailscale tailscale status 2>&1 | head -3
 doas docker exec <OLD-NODE-EXIT-NYMVPN> tailscale status 2>&1 | head -3
 
 say "D2. Le tunnel nym est il reellement connecte"
-# On regarde l etat du client, pas le health des conteneurs : le runbook
+# On regarde l etat du client, pas le health des conteneurs : logbook.md
 # signale que les conteneurs disaient healthy avec le tunnel tombe.
 doas docker exec nym nym-vpnc status --table-style blank 2>&1 | head -2
 
