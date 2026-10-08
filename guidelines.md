@@ -1,59 +1,166 @@
 # Guidelines : les règles du projet
 
-Ce fichier énonce les règles. Il ne donne pas leur raison. La raison est dans `reasons.md`. L'événement qui a produit la règle est dans `runbook.md`.
+Ce fichier fixe les règles de travail, de codage, de configuration et de documentation. Il contient aussi le vocabulaire commun. Appliquez les règles présentes dans ce fichier.
 
-Lisez ce fichier avant d'agir.
+Ce fichier évolue avec le projet, comme le reste de la documentation. Avant de modifier une règle, obtenez l'accord de l'utilisateur. Appliquez ensuite la version approuvée.
 
-## Les conventions
+## Le travail
 
-- Format des dates : `AAAA-MM-JJ`.
-- Chaque service vit dans `/opt/<service>`. Le répertoire appartient à root.
-- Chaque projet compose possède son propre fichier `.env`.
-- Le fichier `.env` est en mode `600`. Il reste hors du repo. Le fichier `.env.example` est le gabarit. Le `.gitignore` reste strict.
-- Chaque image distante est épinglée par digest. Les images locales sont épinglées par version. N'utilisez jamais `latest` sans vérification.
-- Chaque conteneur qui doit survivre à un redémarrage porte `restart: unless-stopped`.
-- Les services restent accessibles par le tailnet seulement.
-- N'écrivez pas de script unique avant d'avoir assez de projets. Un script demande sa propre maintenance.
-- Mettez la documentation à jour après chaque étape.
-- Une tâche vit à un seul endroit. Les autres fichiers font un lien vers elle.
-
-## Les secrets
-
-- Ne cherchez jamais une clé, une graine ou un mot de passe dans les fichiers de l'utilisateur. N'utilisez un secret que si l'utilisateur vous le donne.
-- Ne lancez jamais `nym-vpnd -v`. La mnemonic Nym sort dans les journaux au niveau `info`.
-- Ne copiez jamais la mnemonic sur le disque de l'hôte. Elle vit dans le volume `nym-data`, au chemin `/var/lib/nym-vpnd/mainnet/mnemonic.json` dans le conteneur.
-- Vous voyez `TS_AUTHKEY` en clair dans `docker inspect <OLD-NODE-EXIT-NYMVPN>`. Ce n'est pas une fuite. La variable passe par l'environnement du conteneur.
-
-## Docker
-
-- Ne lancez jamais `docker rm -f` avec un motif de nom. Ciblez le nom exact du conteneur. Ou laissez `docker compose down` agir projet par projet.
-- Les deux voies vivent sur le même hôte. Un motif de nom commun frappe les deux voies. L'incident du 2026-10-01 est dans `runbook.md`, section « L'incident du 2026-10-01 : la perte de l'accès à la voie 1 ».
-- Après un rebuild de `nym`, ne lancez pas `docker compose up -d` sans argument. Utilisez `docker compose up -d --no-deps nym`. La raison de cette règle est dans `operations.md`.
-- Ne recréez jamais `<OLD-NETNS>` seul. Recréez aussi `nym` et `<OLD-NODE-EXIT-NYMVPN>`, car l'espace réseau appartient à `<OLD-NETNS>`.
-
-## Le réseau
-
-- Ne coupez jamais `wlan0`. Il sert de repli. `uplink-guard` ne le touche jamais.
-- Ne posez jamais le domaine réglementaire avec `iw reg set FR` à distance. Ne modifiez jamais `wpa_supplicant` à distance. Les deux opérations exigent une désassociation Wi-Fi. La désassociation coupe l'accès à une machine sans accès physique. Faites-les uniquement avec quelqu'un sur place.
-- L'instabilité se corrige avec l'épinglage de la passerelle. Elle ne se corrige pas avec les sysctl ARP. Laissez `arp_ignore` et `arp_announce` à leurs valeurs par défaut.
-- Ne répétez jamais `ip route replace` sur la route épinglée. La commande supprime puis recrée la route. Elle crée une micro-coupure. Le gardien ne touche à la route que si l'état diffère.
-
-## La voie 1 et la voie 2
-
-- N'écrivez rien sur la voie 1 sans l'accord de l'utilisateur.
-- Vous pouvez écrire librement sur la voie 2.
-- N'utilisez pas `network_mode: host` pour la voie 2. Une route par défaut mal placée casserait la route de l'hôte. La voie 1 deviendrait injoignable.
-- N'exposez jamais un service sur Internet par vous-même. L'exposition publique est une décision séparée et différée.
-
-## La modalité de travail
-
-- L'agent propose les commandes et les exécute. L'utilisateur colle les sorties de chaque commande. L'agent les lit lui-même s'il a l'accès.
+- Avant une correction, consultez les sources pertinentes pour comprendre le comportement actuel.
+- Présentez le changement prévu et ses conséquences avant de l'appliquer.
+- Obtenez l'accord de l'utilisateur avant toute correction.
+- Si une décision reste incertaine, demandez à l'utilisateur de la trancher.
+- Avant de modifier la voie 1, obtenez l'accord de l'utilisateur.
+- L'agent peut modifier la voie 2 sans autorisation supplémentaire pour chaque commande d'une intervention approuvée.
+- L'agent exécute les commandes lorsqu'il dispose de l'accès nécessaire.
+- Si l'agent ne dispose pas de cet accès, l'utilisateur exécute les commandes et transmet les sorties.
 - L'utilisateur saisit son mot de passe `doas`.
-- L'utilisateur garde la main sur la voie 1.
+- Conservez les faits historiques lors d'une réorganisation de la documentation.
+- Avant de corriger un fait historique, présentez la correction à l'utilisateur.
 
-## Le style de la documentation
+## Le codage et la configuration
 
-- Utilisez l'impératif pour les procédures. Utilisez l'indicatif présent pour l'état.
-- Une case cochée décrit un travail fait. Elle ne prouve pas que l'objet existe encore.
-- Un piège est un titre `#####`. Il n'est pas un paragraphe en gras. Il doit entrer dans la table des matières et pouvoir être lié.
-- La section « L'état réel de la machine » de `architecture.md` prime sur les autres fichiers.
+- Choisissez des noms qui expriment le rôle des services.
+- Avant d'ajouter un outil ou une automatisation, identifiez le besoin qu'il couvre.
+- Privilégiez une solution existante lorsqu'elle répond à ce besoin.
+- Limitez chaque modification au besoin identifié.
+- Pour supprimer ou recréer une ressource, ciblez son nom exact.
+- Limitez chaque opération aux services concernés.
+- Avant de modifier un composant, identifiez les composants qui dépendent de lui.
+- Vérifiez le fonctionnement d'ensemble, en plus de chaque composant.
+- Préservez les données et les identités persistantes lors d'une modification.
+- Vérifiez le résultat avec les critères définis dans [todo.md](todo.md).
+
+### La configuration des microservices
+
+- Placez chaque projet Compose dans `/opt/<service>`.
+- Donnez le répertoire du projet à root.
+- Épinglez les images distantes par digest et les images locales par version.
+- Pour un conteneur qui doit reprendre après un redémarrage, définissez `restart: unless-stopped`.
+- Vérifiez la compatibilité des configurations des composants qui échangent des données.
+- Avant le déploiement, réglez les incompatibilités identifiées.
+
+### Les secrets
+
+- Ne cherchez jamais une clé, une graine ou un mot de passe dans les fichiers de l'utilisateur.
+- N'utilisez un secret que si l'utilisateur vous le donne.
+- Conservez les secrets dans le stockage prévu pour le service.
+- Pour les variables secrètes du projet Compose, utilisez un fichier `.env` en mode `600`.
+- Excluez les secrets du dépôt avec `.gitignore`.
+- Versionnez un fichier `.env.example` contenant les noms des variables et des valeurs non secrètes.
+- Ne lancez pas de commande qui affiche des secrets.
+- Traitez les sorties contenant des secrets comme des données sensibles.
+- Avant de partager une sortie ou de la consigner, masquez les secrets.
+
+### Le réseau
+
+- Séparez l'espace réseau de la voie anonymisée de celui de l'hôte.
+- Conservez une liaison de repli disponible.
+- Pour modifier les paramètres de la liaison de repli, exigez une présence sur place.
+- Avant de changer un paramètre réseau, vérifiez le besoin et l'espace réseau concernés.
+- Limitez le changement à cet espace réseau.
+- Si l'état souhaité est déjà obtenu, conservez-le sans réappliquer le changement.
+- Gardez les services accessibles par le tailnet.
+- Avant une exposition publique, obtenez une décision explicite de l'utilisateur.
+
+## La documentation
+
+Organisez chaque fichier selon son rôle. Donnez à chaque information une source de référence. Utilisez des liens pour les détails déjà documentés.
+
+### Le rôle des fichiers
+
+Choisissez le fichier selon le rôle de l'information. Respectez l'organisation propre à ce fichier. Le tableau précise le contenu de chacun.
+
+| Fichier | Axe | Contenu |
+|---|---|---|
+| [readme.md](readme.md) | Présentation | Le projet, les parcours de lecture et l'avancement par fonction. |
+| [philosophy.md](philosophy.md) | Principes | Les objectifs, la menace et les principes du projet. |
+| [guidelines.md](guidelines.md) | Règles | Les règles de travail, de codage, de configuration et de documentation, ainsi que le vocabulaire commun. |
+| [architecture.md](architecture.md) | État actuel | Les composants, leurs relations, les chemins du trafic et les limites connues, décrits par du texte et des schémas. |
+| [maintenance.md](maintenance.md) | Maintenance | Les procédures d'entretien, de diagnostic et de réparation du système existant, avec leurs conditions et leurs résultats attendus. |
+| [todo.md](todo.md) | Travaux restants | Les tâches à effectuer, avec leur objectif, leurs conditions, leurs étapes et leurs critères de réussite. |
+| [logbook.md](logbook.md) | Historique | Les événements datés, les décisions techniques, les essais, les commandes exécutées et les résultats. |
+
+### Le cheminement d'une modification
+
+Avant une nouvelle fonction ou un correctif, inscrivez l'objectif et les critères de réussite dans [todo.md](todo.md). Pendant le travail, consignez les essais, les échecs et les résultats datés dans [logbook.md](logbook.md). Quand les critères de réussite sont vérifiés, mettez à jour l'état réel dans [architecture.md](architecture.md).
+
+Si une modification produit une procédure de maintenance réutilisable, ajoutez-la dans [maintenance.md](maintenance.md). Si elle produit une nouvelle règle, ajoutez-la dans [guidelines.md](guidelines.md). Si elle change un principe du projet, mettez à jour [philosophy.md](philosophy.md).
+
+Une tâche est terminée lorsque ses critères sont vérifiés et que les documents concernés sont à jour. Retirez alors cette tâche de [todo.md](todo.md). Conservez son historique dans [logbook.md](logbook.md).
+
+### La pertinence et le minimalisme
+
+- Documentez ce qui permet de comprendre le système, de prendre une décision ou d'effectuer une opération.
+- Remplacez les statuts génériques par une information utile au lecteur.
+- Conservez les détails qui expliquent un fonctionnement, une limite ou une conséquence.
+- Réduisez les répétitions en renvoyant à la source de référence.
+- Choisissez un schéma pour les relations, une liste pour les étapes et un tableau pour les comparaisons.
+- Conservez les cas particuliers dans le fichier correspondant à leur rôle.
+- Dans [guidelines.md](guidelines.md), formulez la règle générale issue d'un cas particulier.
+
+### La rédaction
+
+- Utilisez l'impératif pour les procédures, le présent pour l'état et le passé pour les événements.
+- Limitez les phrases à 20 mots pour les procédures et à 25 mots pour les descriptions.
+- Donnez une seule instruction par phrase.
+- Présentez la condition avant l'action.
+- Pour un avertissement, présentez la consigne avant le risque.
+- Utilisez des termes précis.
+- Gardez le même sens pour chaque terme.
+- Définissez les termes techniques nécessaires dans le glossaire.
+- Utilisez « vérifiez » pour les contrôles.
+- Choisissez des titres qui indiquent le sujet de la section.
+- Pour une information à référencer, choisissez un titre qui permet un lien direct.
+- Utilisez des liens relatifs pour les fichiers du dépôt.
+- Dans le README, présentez chaque lien documentaire avec son rôle entre backticks.
+
+### La précision et la relecture
+
+- Distinguez les faits vérifiés, les hypothèses et les objectifs.
+- Pour un fait actuel, consultez les sources pertinentes avant de l'affirmer.
+- Pour un constat passé, conservez la date et le contexte disponibles.
+- Si la date manque, indiquez qu'elle n'est pas consignée.
+- Traitez une case cochée comme la trace d'un travail terminé.
+- Utilisez [architecture.md](architecture.md) comme référence pour l'état actuel du système.
+- Pour établir l'état réel, vérifiez directement sur le serveur. La documentation ne remplace pas cette vérification.
+- Après une modification, relisez les fichiers concernés et vérifiez leurs renvois.
+- Vérifiez les noms, les chemins, les adresses et les valeurs techniques.
+- Pour une réorganisation importante, faites relire la documentation par un lecteur sans l'historique du travail.
+- Vérifiez qu'il distingue le fonctionnement actuel, les événements passés et les travaux restants.
+
+## Le vocabulaire
+
+Ce glossaire définit les termes nécessaires à la lecture du projet. Les définitions expliquent les concepts. Les configurations propres au serveur sont décrites dans [architecture.md](architecture.md).
+
+| Terme | Définition |
+|---|---|
+| Agent | Assistant qui aide à la maintenance. Il obtient l'accord de l'utilisateur avant d'écrire. |
+| Serveur | Ordinateur qui fournit des services à d'autres appareils. |
+| Conteneur | Environnement isolé pour exécuter un service. Certains éléments, dont l'espace réseau, peuvent être partagés. |
+| Espace réseau | Ensemble isolé d'interfaces, de routes et de règles de pare-feu. Plusieurs conteneurs peuvent le partager. |
+| Exit node | Nœud Tailscale qui relaie le trafic des autres appareils vers Internet. |
+| Voie 1 | Sortie Internet directe, par la `<ISP-BOX>`. L'adresse publique est celle de la box. |
+| Voie 2 | Sortie Internet par l'anonymiseur Nym, avec deux sauts. |
+| Tailnet | Réseau privé d'appareils géré par Tailscale. |
+| Table de routage | Ensemble de routes utilisé pour choisir le chemin d'un paquet. |
+| Étiquette de paquet, `fwmark` | Valeur attachée à un paquet pour orienter son routage ou son traitement par le pare-feu. |
+| Route par défaut | Route utilisée lorsqu'aucune route plus précise ne correspond à la destination. |
+| Conteneur compagnon, sidecar | Conteneur qui fournit une fonction complémentaire à un autre conteneur. |
+| `--accept-routes=true` | Option d'acceptation des routes annoncées par d'autres nœuds Tailscale. |
+| DERP | Relais Tailscale utilisé quand une connexion directe entre pairs n'est pas possible. |
+| WireGuard | Protocole de chiffrement utilisé par Tailscale et par le client Nym pour leurs tunnels. |
+| MTU | Taille maximale d'un paquet IP transporté sans fragmentation sur une liaison. |
+| Anonymiseur | Service qui masque l'adresse d'origine du trafic qu'il relaie. |
+| Mode fast | Mode Nym avec deux sauts, une passerelle d'entrée puis une passerelle de sortie. |
+| Mixnet | Réseau qui mélange le trafic de plusieurs utilisateurs pour réduire la corrélation entre envoi et réception. |
+| `.env` | Fichier de variables utilisé pour la configuration d'un projet Compose. |
+| `<ISP-BOX>` | Box d'accès Internet du fournisseur `<ISP>`. |
+| WoL | Mécanisme de réveil d'un ordinateur par le réseau local. |
+| MagicDNS | Fonction Tailscale qui résout les noms des appareils du tailnet. |
+| fail-closed | Comportement qui bloque le trafic protégé quand le tunnel manque, plutôt que de le laisser sortir directement. |
+| supervise-daemon | Superviseur OpenRC qui relance un service selon sa configuration. |
+| Superviseur | Boucle shell du conteneur Nym. Elle relance le client et répare les règles. |
+| Digest | Empreinte du contenu d'une image. Elle identifie l'image à télécharger. |
+| sysctl | Interface Linux de lecture et de modification des paramètres du noyau. |
+| Graine, mnemonic | Phrase de récupération qui donne accès à une identité ou à un compte. |
