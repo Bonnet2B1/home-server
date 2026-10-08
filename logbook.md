@@ -465,3 +465,5 @@ Les dates des pièges 1, 2, 3, 4 et 5 sont estimées, au 2026-09-30 ou au 2026-1
 Trois lecteurs sans historique ont relu les sept fichiers. Le lecteur des procédures a trouvé dix lacunes de contenu, devenues des tâches. Le lecteur de navigation a trouvé un renvoi invalide et des termes non définis. Le lecteur de l'architecture a annoncé des contradictions. Le serveur a infirmé plusieurs d'entre elles : la chaîne `nat` est bien accrochée à `postrouting` et reste vide, et les priorités 5206, 5207 et 5208 confirment le calcul annoncé.
 
 Le serveur a confirmé le mode espace utilisateur de la voie 1, avec l'option `--tun=userspace-networking` et aucune interface `tailscale0` sur l'hôte. Il a confirmé le refus du port 53 par les règles nft de Nym. Il a confirmé une MTU effective de 1340 octets sur la voie 2, mesurée sur du trafic réel. Il a fourni le digest complet de l'image de la voie 1, absent du journal avant ce jour.
+
+Les changements ont été enregistrés en sept commits le 2026-10-08, un par périmètre. La réorganisation de la documentation est terminée. La tâche correspondante a été retirée de [todo.md](todo.md).

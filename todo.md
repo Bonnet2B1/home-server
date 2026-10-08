@@ -2,33 +2,6 @@
 
 Ce fichier liste les tâches restantes. Chaque tâche porte son objectif, ses conditions, ses étapes et ses critères de réussite. Le détail des faits est dans [architecture.md](architecture.md) et dans [logbook.md](logbook.md).
 
-## La réorganisation de la documentation
-
-Les rôles et les règles de rédaction sont définis dans [guidelines.md](guidelines.md). Le reclassement, le contrôle de cohérence et les tests lecteurs sont terminés. Il reste le découpage des commits.
-
-### Le découpage des commits
-
-#### Objectif
-
-Enregistrer dans Git les changements approuvés. Chaque commit correspond à un périmètre validé.
-
-#### Conditions
-
-La validation finale des sept fichiers est obtenue. L'utilisateur a approuvé le découpage des commits.
-
-#### Étapes
-
-- Proposez le découpage des commits.
-- Enregistrez les changements approuvés après accord.
-- Vérifiez que les fichiers correspondent au périmètre validé.
-- Vérifiez que les secrets restent hors du dépôt.
-
-#### Critères de réussite
-
-- Chaque commit correspond au périmètre validé.
-- Les sept fichiers sont enregistrés.
-- Aucun secret n'est versionné.
-
 ## La voie 2
 
 La voie 2 est en service depuis le 2026-10-03. Une seule tâche lui reste ouverte.
