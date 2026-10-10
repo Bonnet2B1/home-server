@@ -228,10 +228,10 @@ Projets, dossiers et volumes :
 - [ ] Palier B — voie 1 :
   - [x] Revérifier l'SSH par le LAN.
   - [x] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state` *(CLI sans `volume rename` → `volume create` + `cp -a` + `diff -r` + sha256 identiques ; ancien volume conservé jusqu'au vert final)*, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
-  - [x] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; SSH par Tailscale ✓ partiel : bannière `SSH-2.0-OpenSSH_10.3` reçue depuis le membre tailnet `ts-test` sur `<TAILNET-IP-EXIT-DIRECT>:22` + `tailscale ping` 5 ms — la session interactive depuis le Mac reste à confirmer au retour de son client (actuellement `Tailscale is stopped`).
+  - [x] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; SSH par Tailscale ✓ de bout en bout depuis le Mac : `ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>` répond (`<OLD-SERVER-NAME>`), validé après retour de `<HOST-MACBOOK>` sur le tailnet (sortie directe `exit-direct` sélectionnée, `ExitNodeAllowLANAccess` actif).
   - [x] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
 - [x] Vérification finale :
-  - [x] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn` : verdicts attendus du nœud direct et `VERT` anonymisé, IP `<WAN-IP-BOX-A>` → `57.131.28.186`), le tunnel est connecté, l'SSH LAN fonctionne. *(adguard : N/A, non déployé. SSH par tailnet : à vérifier au retour du client tailscale du Mac.)*
+  - [x] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn` : verdicts attendus du nœud direct et `VERT` anonymisé, IP `<WAN-IP-BOX-A>` → `57.131.28.186`), le tunnel est connecté, l'SSH LAN fonctionne. *(adguard : N/A, non déployé. SSH par tailnet : validé de bout en bout depuis `<HOST-MACBOOK>` le 2026-10-10.)*
   - [x] Note datée dans logbook.md.
 - [x] Nettoyage (après vert final) : suppression des volumes orphelins par noms exacts (`tailscale-nym_state`, `tailscale-nym_nym-data`, `tailscale-nym_ts-sock`, `tailscale_state`).
 

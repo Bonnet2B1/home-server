@@ -491,3 +491,11 @@ Le client de diagnostic `ts-client` a été recréé sur le Mac avec une clé d'
 Les volumes orphelins ont été supprimés par noms exacts après le vert final : `tailscale-nym_state`, `tailscale-nym_nym-data`, `tailscale-nym_ts-sock`, `tailscale_state`. Restent les volumes `exit-direct_state` et `exit-nymvpn_state`, `exit-nymvpn_nym-data`, `exit-nymvpn_ts-sock`.
 
 Restent des gestes côté clients à la reconnexion : démarrer Tailscale sur le Mac, vérifier l'SSH par le tailnet (`<TAILNET-IP-EXIT-DIRECT>`), reconnecter et re-sélectionner `exit-nymvpn` (et `exit-direct` en sortie directe) sur `<HOST-IPHONE>` et `<HOST-MACBOOK>`.
+
+### Le retour de `<HOST-MACBOOK>` sur le tailnet du 2026-10-10
+
+Le client Tailscale du Mac a été redémarré dans la soirée. L'identité conservée a repris sa place : `<HOST-MACBOOK>` en `<TAILNET-IP-CLIENT>`. La sortie directe `exit-direct` a été sélectionnée comme exit node, avec `ExitNodeAllowLANAccess` actif pour préserver l'accès au réseau local.
+
+L'SSH par le tailnet a été validé de bout en bout depuis le Mac : `ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>` répond. L'SSH par le LAN reste fonctionnel. `tailscale ping` vers `exit-direct` répond en quelques millisecondes.
+
+À la reconnexion du téléphone, `<HOST-IPHONE>` reprendra sa place et devra re-sélectionner une sortie dans l'app (par exemple `exit-nymvpn` pour la voie anonymisée).
