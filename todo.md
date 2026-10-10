@@ -200,6 +200,7 @@ Projets, dossiers et volumes :
 - `/opt/tailscale` → `/opt/exit-direct`, `name: exit-direct`, volume `exit-direct_state`.
 - `/opt/tailscale-nym` → `/opt/exit-nymvpn`, `name: exit-nymvpn`, volumes `exit-nymvpn_state`, `exit-nymvpn_nym-data`, `exit-nymvpn_ts-sock`.
 - Dossier du dépôt `tailscale-nym/` → `exit-nymvpn/`.
+- Dossier du dépôt `tailscale/` → `exit-direct/`.
 - Les volumes sont migrés par `docker volume rename` (mêmes données, même identité), conteneurs arrêtés avant.
 
 #### Conditions
@@ -228,7 +229,7 @@ Projets, dossiers et volumes :
   - [ ] Revérifier l'SSH par le LAN.
   - [ ] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state`, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
   - [ ] Porte B : `docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée ; SSH fonctionne par Tailscale et par le LAN ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant.
-  - [ ] Mise à jour des docs restantes, commit.
+  - [ ] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
 - [ ] Vérification finale :
   - [ ] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn`), le tunnel est connecté, l'SSH fonctionne, adguard répond.
   - [ ] Note datée dans logbook.md.
