@@ -18,18 +18,18 @@ La liste des pays est sourcée et approuvée. Les données de localisation trans
 
 #### Étapes
 
-- Ajoutez les pays qui imposent des restrictions excessives au trafic Internet.
-- Vérifiez comment le géo-bypass traite ces pays.
-- Vérifiez quelles données de localisation il transmet.
-- Activez le géo-bypass selon la liste retenue.
-- Mettez à jour [philosophy.md](philosophy.md) pour refléter ce choix.
+- [ ] Ajoutez les pays qui imposent des restrictions excessives au trafic Internet.
+- [ ] Vérifiez comment le géo-bypass traite ces pays.
+- [ ] Vérifiez quelles données de localisation il transmet.
+- [ ] Activez le géo-bypass selon la liste retenue.
+- [ ] Mettez à jour [philosophy.md](philosophy.md) pour refléter ce choix.
 
 #### Critères de réussite
 
-- Chaque pays de la liste possède une source.
-- Les données de localisation transmises sont connues.
-- Le géo-bypass suit la liste approuvée.
-- [philosophy.md](philosophy.md) reflète le choix retenu.
+- [ ] Chaque pays de la liste possède une source.
+- [ ] Les données de localisation transmises sont connues.
+- [ ] Le géo-bypass suit la liste approuvée.
+- [ ] [philosophy.md](philosophy.md) reflète le choix retenu.
 
 ## Les étapes communes
 
@@ -47,16 +47,16 @@ Le déploiement d'AdGuard Home déclenche cet arbitrage. Les sources définissen
 
 #### Étapes
 
-- Choisissez un réglage sans boucle DNS.
-- Définissez le résolveur amont selon le choix de sortie.
-- Vérifiez la compatibilité avec la sortie choisie.
-- Vérifiez le fonctionnement DNS avant la fin de la tâche.
+- [ ] Choisissez un réglage sans boucle DNS.
+- [ ] Définissez le résolveur amont selon le choix de sortie.
+- [ ] Vérifiez la compatibilité avec la sortie choisie.
+- [ ] Vérifiez le fonctionnement DNS avant la fin de la tâche.
 
 #### Critères de réussite
 
-- La résolution par le tailnet ne boucle pas.
-- Le réglage est compatible avec la sortie choisie.
-- Le fonctionnement DNS est vérifié avant la fin.
+- [ ] La résolution par le tailnet ne boucle pas.
+- [ ] Le réglage est compatible avec la sortie choisie.
+- [ ] Le fonctionnement DNS est vérifié avant la fin.
 
 ### Le DNS de l'hôte lors d'une récupération
 
@@ -70,20 +70,20 @@ Le diagnostic est dans [logbook.md](logbook.md), section « La résolution du 20
 
 #### Étapes
 
-- Choisissez entre un diagnostic sans changement de DNS et un recours temporaire à un résolveur public.
-- Avant toute modification, vérifiez la configuration réelle sur le serveur.
-- Évaluez les conséquences sur les noms du tailnet, la confidentialité des requêtes et l'accès distant.
-- Si un recours public est retenu, définissez ses conditions d'utilisation et le retour au réglage initial.
-- Faites approuver le choix avant de modifier le DNS.
-- Documentez la procédure retenue et ses résultats attendus dans [maintenance.md](maintenance.md).
-- Vérifiez que la procédure conserve l'accès distant et prévoit un retour au réglage initial.
+- [ ] Choisissez entre un diagnostic sans changement de DNS et un recours temporaire à un résolveur public.
+- [ ] Avant toute modification, vérifiez la configuration réelle sur le serveur.
+- [ ] Évaluez les conséquences sur les noms du tailnet, la confidentialité des requêtes et l'accès distant.
+- [ ] Si un recours public est retenu, définissez ses conditions d'utilisation et le retour au réglage initial.
+- [ ] Faites approuver le choix avant de modifier le DNS.
+- [ ] Documentez la procédure retenue et ses résultats attendus dans [maintenance.md](maintenance.md).
+- [ ] Vérifiez que la procédure conserve l'accès distant et prévoit un retour au réglage initial.
 
 #### Critères de réussite
 
-- Le choix du DNS est approuvé avant modification.
-- La procédure conserve l'accès distant au serveur.
-- La procédure prévoit un retour au réglage initial.
-- La procédure est documentée dans [maintenance.md](maintenance.md).
+- [ ] Le choix du DNS est approuvé avant modification.
+- [ ] La procédure conserve l'accès distant au serveur.
+- [ ] La procédure prévoit un retour au réglage initial.
+- [ ] La procédure est documentée dans [maintenance.md](maintenance.md).
 
 ### Les modes d'accès d'un microservice
 
@@ -97,16 +97,16 @@ Le mode d'accès décide du pare-feu et de la sortie du compagnon. Aucun mode n'
 
 #### Étapes
 
-- Recensez les besoins : le tailnet seul, le réseau local, un accès public.
-- Décrivez pour chaque mode son adresse d'écoute et son accès.
-- Ajoutez le terme « mode d'accès » au glossaire de [guidelines.md](guidelines.md).
-- Remplacez « Définissez le mode d'accès » dans les tâches concernées.
+- [ ] Recensez les besoins : le tailnet seul, le réseau local, un accès public.
+- [ ] Décrivez pour chaque mode son adresse d'écoute et son accès.
+- [ ] Ajoutez le terme « mode d'accès » au glossaire de [guidelines.md](guidelines.md).
+- [ ] Remplacez « Définissez le mode d'accès » dans les tâches concernées.
 
 #### Critères de réussite
 
-- Chaque mode porte une adresse d'écoute et une règle d'accès.
-- Les tâches AdGuard Home et WoL citent un mode choisi.
-- Le glossaire définit le terme « mode d'accès ».
+- [ ] Chaque mode porte une adresse d'écoute et une règle d'accès.
+- [ ] Les tâches AdGuard Home et WoL citent un mode choisi.
+- [ ] Le glossaire définit le terme « mode d'accès ».
 
 ### La procédure générique de déploiement d'un microservice
 
@@ -120,16 +120,16 @@ Les sources du service existent dans le dépôt. L'utilisateur donne son accord 
 
 #### Étapes
 
-- Ajoutez une section qui crée le répertoire du projet dans `/opt`.
-- Ajoutez le transfert des sources depuis le Mac.
-- Ajoutez la construction de l'image et la création du conteneur.
-- Indiquez où exécuter `adguard/verif.sh` et son résultat attendu.
+- [ ] Ajoutez une section qui crée le répertoire du projet dans `/opt`.
+- [ ] Ajoutez le transfert des sources depuis le Mac.
+- [ ] Ajoutez la construction de l'image et la création du conteneur.
+- [ ] Indiquez où exécuter `adguard/verif.sh` et son résultat attendu.
 
 #### Critères de réussite
 
-- La procédure s'applique à un projet autre que la voie 2.
-- Chaque étape nomme sa commande et son résultat attendu.
-- `adguard/verif.sh` a un résultat attendu documenté.
+- [ ] La procédure s'applique à un projet autre que la voie 2.
+- [ ] Chaque étape nomme sa commande et son résultat attendu.
+- [ ] `adguard/verif.sh` a un résultat attendu documenté.
 
 ### Le trajet DNS de chaque voie
 
@@ -143,16 +143,16 @@ L'arbitrage DNS reste ouvert dans la tâche « Le réglage DNS d'AdGuard Home »
 
 #### Étapes
 
-- Relevez le résolveur utilisé par un appareil du tailnet sur chaque voie.
-- Relevez le résolveur du conteneur qui relaie le trafic.
-- Ajoutez le trajet dans [architecture.md](architecture.md).
-- Ajoutez les commandes de contrôle dans [maintenance.md](maintenance.md).
+- [ ] Relevez le résolveur utilisé par un appareil du tailnet sur chaque voie.
+- [ ] Relevez le résolveur du conteneur qui relaie le trafic.
+- [ ] Ajoutez le trajet dans [architecture.md](architecture.md).
+- [ ] Ajoutez les commandes de contrôle dans [maintenance.md](maintenance.md).
 
 #### Critères de réussite
 
-- Le trajet DNS est décrit pour les deux voies.
-- Une commande permet de vérifier le résolveur actif.
-- Le réglage de `--accept-dns` est expliqué.
+- [ ] Le trajet DNS est décrit pour les deux voies.
+- [ ] Une commande permet de vérifier le résolveur actif.
+- [ ] Le réglage de `--accept-dns` est expliqué.
 
 ### La démonstration du fail-closed
 
@@ -166,16 +166,16 @@ Un créneau permet de couper le tunnel. Le client de test est disponible sur le 
 
 #### Étapes
 
-- Arrêtez le tunnel Nym sur le serveur.
-- Demandez une page web au client avec `<OLD-NODE-EXIT-NYMVPN>` sélectionné.
-- Notez le résultat, l'erreur ou le délai obtenu.
-- Rétablissez le tunnel et vérifiez le relais.
+- [ ] Arrêtez le tunnel Nym sur le serveur.
+- [ ] Demandez une page web au client avec `<OLD-NODE-EXIT-NYMVPN>` sélectionné.
+- [ ] Notez le résultat, l'erreur ou le délai obtenu.
+- [ ] Rétablissez le tunnel et vérifiez le relais.
 
 #### Critères de réussite
 
-- Le client n'atteint aucun site par l'adresse de la `<ISP-BOX>`.
-- Le résultat est consigné avec sa date dans [logbook.md](logbook.md).
-- [architecture.md](architecture.md) décrit le comportement observé.
+- [ ] Le client n'atteint aucun site par l'adresse de la `<ISP-BOX>`.
+- [ ] Le résultat est consigné avec sa date dans [logbook.md](logbook.md).
+- [ ] [architecture.md](architecture.md) décrit le comportement observé.
 
 ## Les évolutions du projet
 
@@ -193,38 +193,78 @@ Le conteneur Nym pour le mixnet n'existe pas encore. Sa conception précède son
 
 #### Étapes
 
-- Définissez le rôle du conteneur Nym.
-- Définissez son intégration avec les services existants.
-- Déployez le conteneur après validation de la conception.
+- [ ] Définissez le rôle du conteneur Nym.
+- [ ] Définissez son intégration avec les services existants.
+- [ ] Déployez le conteneur après validation de la conception.
 
 #### Critères de réussite
 
-- Le rôle du conteneur est documenté.
-- Son intégration est validée avec les services existants.
-- Le conteneur Nym est déployé.
+- [ ] Le rôle du conteneur est documenté.
+- [ ] Son intégration est validée avec les services existants.
+- [ ] Le conteneur Nym est déployé.
 
 ### Le renommage des services
 
 #### Objectif
 
-Renommer les services avec des noms qui expriment leur rôle. Les références sont mises à jour dans les configurations, les scripts et la documentation.
+Renommer les services avec des noms qui expriment leur rôle, sans casser le fonctionnement. L'identité Tailscale et Nym reste conservée. Ce renommage est unique : les noms de rôle deviennent des références stables, aucun autre renommage cosmétique ensuite.
+
+Correspondance des noms :
+
+| Rôle | Clé de service | `container_name` | Nœud Tailscale |
+|---|---|---|---|
+| Voie 1 | `tailscale` → `exit-direct` | `tailscale` → `exit-direct` | `<OLD-SERVER-NAME>` → `exit-direct` (`<TAILNET-IP-EXIT-DIRECT>`) |
+| Espace voie 2 | `netns` → `netns-nymvpn` (+ `hostname: netns-nymvpn`) | `<OLD-NETNS>` → `netns-nymvpn` | — |
+| Tunnel voie 2 | `nym` → `tunnel-nymvpn` | `nym` → `tunnel-nymvpn` | — |
+| Sortie voie 2 | `tailscale` → `exit-nymvpn` | `<OLD-NODE-EXIT-NYMVPN>` → `exit-nymvpn` | `<OLD-NODE-EXIT-NYMVPN>` → `exit-nymvpn` (`<TAILNET-IP-EXIT-NYMVPN>`) |
+
+Projets, dossiers et volumes :
+
+- `/opt/tailscale` → `/opt/exit-direct`, `name: exit-direct`, volume `exit-direct_state`.
+- `/opt/tailscale-nym` → `/opt/exit-nymvpn`, `name: exit-nymvpn`, volumes `exit-nymvpn_state`, `exit-nymvpn_nym-data`, `exit-nymvpn_ts-sock`.
+- Dossier du dépôt `tailscale-nym/` → `exit-nymvpn/`.
+- Les volumes sont migrés par `docker volume rename` (mêmes données, même identité), conteneurs arrêtés avant.
 
 #### Conditions
 
-Le renommage touche les configurations, les scripts et la documentation. Chaque composant dépendant est identifié avant le changement.
+- Le renommage touche les configurations, les scripts et la documentation. Chaque composant dépendant est identifié avant le changement.
+- L'exécution se fait par palier, avec une porte complète entre chaque palier. La voie 2 est renommée avant la voie 1.
+- L'accès au serveur par le repli LAN (`<LAN-IP-SERVER>`) est vérifié avant la porte de la voie 1. Recréer la voie 1 depuis une session qui passe par elle coupe l'SSH.
+- Les anciens volumes restent sur le serveur jusqu'au vert final. Ils ne sont supprimés qu'après la vérification d'ensemble.
+- Chaque palier est commité dans le dépôt, scripts et docs à jour dans le même palier.
+- Hors périmètre : adguard (service `tailscale`, conteneur `adguard-tailscale`, nœud `adguard`), la machine `<OLD-SERVER-NAME>`, les mots-produits (`tailscale`, `nym`, `nymvpn`, `netns` comme logiciel, image, commande ou concept), les clients de diagnostic `ts-client` / `ts-test`, les adresses `<TAILNET-IP-EXIT-DIRECT>` et `<TAILNET-IP-EXIT-NYMVPN>`.
+- logbook.md reste intact. Une note datée documente le changement à la fin.
+- Jamais de suppression par motif : conteneurs et volumes sont désignés par leurs noms exacts. Un motif réutiliserait le piège du 2026-10-01.
 
 #### Étapes
 
-- Choisissez des noms qui expriment le rôle des services.
-- Identifiez les composants qui dépendent de chaque service.
-- Mettez à jour les références dans les configurations, les scripts et la documentation.
-- Vérifiez le fonctionnement d'ensemble après le renommage.
+- [ ] Préparation : commit du dépôt, lecture des noms réels des volumes (`doas docker volume ls`), vérification de l'SSH par le LAN (`ssh <ADMIN-ACCOUNT>@<LAN-IP-SERVER>`).
+- [ ] Palier A — voie 2 :
+  - [ ] Arrêt du projet : `docker compose down` dans `/opt/tailscale-nym`.
+  - [ ] Renommage des volumes : `docker volume rename tailscale-nym_state exit-nymvpn_state`, idem pour `tailscale-nym_nym-data` et `tailscale-nym_ts-sock`.
+  - [ ] Déplacement du dossier : `/opt/tailscale-nym` → `/opt/exit-nymvpn`.
+  - [ ] Mise à jour de `docker-compose.yaml` : `name: exit-nymvpn` ; services `netns` → `netns-nymvpn` (conteneur et `hostname`), `nym` → `tunnel-nymvpn`, `tailscale` → `exit-nymvpn` ; références `network_mode: "service:netns-nymvpn"` et `depends_on` suivent ; `--hostname=exit-nymvpn`.
+  - [ ] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
+  - [ ] Porte A : `docker ps` aux noms exacts (aucun ancien) ; IP tailnet inchangée (`<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`) ; `nym-vpnc` Connected ; exit node approuvé ; relais vérifié (loop.sh sur la cible `exit-nymvpn`) ; resélection de l'exit node dans l'app côté clients ; grep des anciens identifiants (`<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>`, `<OLD-NETNS>`, clés `nym` / `netns` / `tailscale`) → 0 hit, hors mots-produits, machine `<OLD-SERVER-NAME>` et historique.
+  - [ ] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
+- [ ] Palier B — voie 1 :
+  - [ ] Revérifier l'SSH par le LAN.
+  - [ ] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state`, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
+  - [ ] Porte B : `docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée ; SSH fonctionne par Tailscale et par le LAN ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant.
+  - [ ] Mise à jour des docs restantes, commit.
+- [ ] Vérification finale :
+  - [ ] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn`), le tunnel est connecté, l'SSH fonctionne, adguard répond.
+  - [ ] Note datée dans logbook.md.
+- [ ] Nettoyage (après vert final) : suppression des volumes orphelins (`tailscale-nym_*`, `tailscale_state`).
 
 #### Critères de réussite
 
-- Chaque service porte un nom qui exprime son rôle.
-- Aucune référence ancienne ne subsiste.
-- Le fonctionnement d'ensemble est vérifié.
+- [ ] Chaque service porte un nom de rôle : `exit-direct`, `netns-nymvpn`, `tunnel-nymvpn`, `exit-nymvpn`.
+- [ ] L'identité est conservée : mêmes adresses Tailscale (`<TAILNET-IP-EXIT-DIRECT>`, `<TAILNET-IP-EXIT-NYMVPN>`), mêmes graines Nym, exit nodes toujours approuvés. Si une porte révèle une identité changée, la nouvelle identité est intégrée : approbations refaites, resélection des clients, adresses mises à jour dans les docs.
+- [ ] Aucune référence ancienne ne subsiste dans les configurations, les scripts et les docs courants, hors exemptions (adguard, machine `<OLD-SERVER-NAME>`, mots-produits, historique logbook).
+- [ ] Le fonctionnement d'ensemble est vérifié : les deux voies, l'SSH, adguard.
+- [ ] Chaque palier est commité et rejouable (les étapes d'un palier se rejouent à l'identique).
+- [ ] Aucune suppression par motif n'a été utilisée.
 
 ### Le nettoyage de l'environnement de diagnostic
 
@@ -238,16 +278,16 @@ Colima, Docker ou Lima servent peut-être encore à d'autres projets. Le périm�
 
 #### Étapes
 
-- Vérifiez si Colima, Docker ou Lima servent encore à d'autres projets ou au diagnostic du serveur.
-- Faites approuver le périmètre du nettoyage avant toute suppression.
-- Si le client doit être retiré, vérifiez le contexte Docker utilisé sur le Mac.
-- Dans ce contexte, supprimez uniquement le conteneur de test :
+- [ ] Vérifiez si Colima, Docker ou Lima servent encore à d'autres projets ou au diagnostic du serveur.
+- [ ] Faites approuver le périmètre du nettoyage avant toute suppression.
+- [ ] Si le client doit être retiré, vérifiez le contexte Docker utilisé sur le Mac.
+- [ ] Dans ce contexte, supprimez uniquement le conteneur de test :
 
 ```sh
 docker rm -f ts-client
 ```
 
-- Si l'environnement entier est devenu inutile, retirez la machine virtuelle avant de désinstaller ses outils :
+- [ ] Si l'environnement entier est devenu inutile, retirez la machine virtuelle avant de désinstaller ses outils :
 
 ```sh
 colima stop
@@ -255,18 +295,18 @@ colima delete
 brew uninstall colima docker lima
 ```
 
-- Dans la console Tailscale, vérifiez que `ts-test-1` appartient à cet essai.
-- Si ce nœud est devenu inutile, supprimez-le depuis la console.
-- Si le client est conservé, vérifiez son image et la disponibilité de `curl` et de `dig`.
-- Épinglez l'image utilisée selon [guidelines.md](guidelines.md) avant de reconstruire cet environnement.
-- Vérifiez que le nettoyage a retiré les éléments approuvés et conservé les autres usages.
+- [ ] Dans la console Tailscale, vérifiez que `ts-test-1` appartient à cet essai.
+- [ ] Si ce nœud est devenu inutile, supprimez-le depuis la console.
+- [ ] Si le client est conservé, vérifiez son image et la disponibilité de `curl` et de `dig`.
+- [ ] Épinglez l'image utilisée selon [guidelines.md](guidelines.md) avant de reconstruire cet environnement.
+- [ ] Vérifiez que le nettoyage a retiré les éléments approuvés et conservé les autres usages.
 
 #### Critères de réussite
 
-- Les éléments approuvés sont supprimés.
-- Les autres usages de Colima et Docker sont conservés.
-- `ts-test-1` est retiré du tailnet s'il est inutile.
-- L'image utilisée est épinglée selon [guidelines.md](guidelines.md).
+- [ ] Les éléments approuvés sont supprimés.
+- [ ] Les autres usages de Colima et Docker sont conservés.
+- [ ] `ts-test-1` est retiré du tailnet s'il est inutile.
+- [ ] L'image utilisée est épinglée selon [guidelines.md](guidelines.md).
 
 ### Les règles nft temporaires
 
@@ -280,21 +320,21 @@ La sortie ne doit contenir aucune règle marquée `TEMPO`. Le contrôle se fait 
 
 #### Étapes
 
-- Sur le serveur, relevez la chaîne concernée :
+- [ ] Sur le serveur, relevez la chaîne concernée :
 
 ```sh
 doas docker exec nym nft list chain inet nym forward
 ```
 
-- Vérifiez l'absence de règle marquée `TEMPO` dans la sortie.
-- Si une règle subsiste, identifiez son rôle avant de proposer son retrait.
-- Faites approuver la correction avant de modifier le pare-feu.
+- [ ] Vérifiez l'absence de règle marquée `TEMPO` dans la sortie.
+- [ ] Si une règle subsiste, identifiez son rôle avant de proposer son retrait.
+- [ ] Faites approuver la correction avant de modifier le pare-feu.
 
 #### Critères de réussite
 
-- La sortie ne contient aucune règle marquée `TEMPO`.
-- Chaque règle subsistante a un rôle identifié.
-- Le pare-feu n'est modifié qu'après approbation.
+- [ ] La sortie ne contient aucune règle marquée `TEMPO`.
+- [ ] Chaque règle subsistante a un rôle identifié.
+- [ ] Le pare-feu n'est modifié qu'après approbation.
 
 ### Les sources de la voie 1 dans le dépôt
 
@@ -308,16 +348,16 @@ Le fichier `.env` ne rejoint jamais le dépôt. Seules les valeurs de configurat
 
 #### Étapes
 
-- Copiez le compose et le `.env.example` dans un répertoire du dépôt.
-- Consignez le digest complet de l'image.
-- Ajoutez un `.gitignore` qui exclut le `.env`.
-- Vérifiez que le dépôt ne contient aucun secret.
+- [ ] Copiez le compose et le `.env.example` dans un répertoire du dépôt.
+- [ ] Consignez le digest complet de l'image.
+- [ ] Ajoutez un `.gitignore` qui exclut le `.env`.
+- [ ] Vérifiez que le dépôt ne contient aucun secret.
 
 #### Critères de réussite
 
-- Le projet de la voie 1 est reconstructible depuis le dépôt.
-- Le digest de l'image est complet et épinglé.
-- Aucun secret ne figure dans le dépôt.
+- [ ] Le projet de la voie 1 est reconstructible depuis le dépôt.
+- [ ] Le digest de l'image est complet et épinglé.
+- [ ] Aucun secret ne figure dans le dépôt.
 
 ## Les phases restantes
 
@@ -335,20 +375,20 @@ Le résolveur AdGuard dépend de l'arbitrage DNS en cours. Le mode d'accès du s
 
 #### Étapes
 
-- Définissez le mode d'accès du service avant toute installation.
-- Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
-- Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
-- Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
-- Changez la sortie avec [maintenance.md](maintenance.md), section « La sortie d'un microservice ».
-- Suivez le gabarit de la phase C en annexe.
-- Vérifiez le fonctionnement du service après son déploiement.
+- [ ] Définissez le mode d'accès du service avant toute installation.
+- [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
+- [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
+- [ ] Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
+- [ ] Changez la sortie avec [maintenance.md](maintenance.md), section « La sortie d'un microservice ».
+- [ ] Suivez le gabarit de la phase C en annexe.
+- [ ] Vérifiez le fonctionnement du service après son déploiement.
 
 #### Critères de réussite
 
-- AdGuard Home est déployé.
-- Le service possède un mode d'accès défini.
-- La sortie du service correspond au choix.
-- Les critères dépendent du mode d'accès retenu.
+- [ ] AdGuard Home est déployé.
+- [ ] Le service possède un mode d'accès défini.
+- [ ] La sortie du service correspond au choix.
+- [ ] Les critères dépendent du mode d'accès retenu.
 
 #### Annexe : le gabarit de la phase C
 
@@ -384,20 +424,20 @@ L'ordinateur à réveiller reste allumé sur le réseau local ou admet le révei
 
 #### Étapes
 
-- Définissez le mode d'accès du service avant toute installation.
-- Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
-- Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
-- Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
-- Suivez le gabarit de la phase C en annexe.
-- Réservez l'adresse IP du serveur sur le réseau local. La réservation ne sert qu'au jour du WoL.
-- Vérifiez le réveil d'un ordinateur après le déploiement.
+- [ ] Définissez le mode d'accès du service avant toute installation.
+- [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
+- [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
+- [ ] Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
+- [ ] Suivez le gabarit de la phase C en annexe.
+- [ ] Réservez l'adresse IP du serveur sur le réseau local. La réservation ne sert qu'au jour du WoL.
+- [ ] Vérifiez le réveil d'un ordinateur après le déploiement.
 
 #### Critères de réussite
 
-- WoL est déployé.
-- Le réveil d'un ordinateur à distance fonctionne.
-- Le service possède un mode d'accès défini.
-- L'adresse IP du serveur est réservée sur le réseau local.
+- [ ] WoL est déployé.
+- [ ] Le réveil d'un ordinateur à distance fonctionne.
+- [ ] Le service possède un mode d'accès défini.
+- [ ] L'adresse IP du serveur est réservée sur le réseau local.
 
 ### La surveillance et les notifications avec ntfy
 
@@ -411,17 +451,17 @@ Le serveur peut être indisponible pendant une coupure de courant. L'émission d
 
 #### Étapes
 
-- Prévoyez une alerte pour une coupure de l'anonymiseur.
-- Prévoyez une alerte pour une coupure de courant.
-- Pour une coupure de courant, définissez comment l'alerte peut être émise lorsque le serveur est indisponible.
-- Vérifiez qu'une alerte correspond à chaque situation.
+- [ ] Prévoyez une alerte pour une coupure de l'anonymiseur.
+- [ ] Prévoyez une alerte pour une coupure de courant.
+- [ ] Pour une coupure de courant, définissez comment l'alerte peut être émise lorsque le serveur est indisponible.
+- [ ] Vérifiez qu'une alerte correspond à chaque situation.
 
 #### Critères de réussite
 
-- Une alerte signale la coupure de l'anonymiseur.
-- Une alerte signale la coupure de courant.
-- Chaque situation déclenche une alerte.
-- L'émission reste possible quand le serveur est indisponible.
+- [ ] Une alerte signale la coupure de l'anonymiseur.
+- [ ] Une alerte signale la coupure de courant.
+- [ ] Chaque situation déclenche une alerte.
+- [ ] L'émission reste possible quand le serveur est indisponible.
 
 ### Le repo GitHub privé
 
@@ -435,18 +475,18 @@ Les sept fichiers sont validés. Le dépôt contiendra `tailscale-nym/`, `adguar
 
 #### Étapes
 
-- Créez le dépôt GitHub privé.
-- Ajoutez `tailscale-nym/`, `adguard/` et cette documentation.
-- Vérifiez que les secrets restent hors du dépôt.
-- Vérifiez que les fichiers correspondent au périmètre validé.
-- Publiez [readme.md](readme.md) comme page d'accueil.
+- [ ] Créez le dépôt GitHub privé.
+- [ ] Ajoutez `tailscale-nym/`, `adguard/` et cette documentation.
+- [ ] Vérifiez que les secrets restent hors du dépôt.
+- [ ] Vérifiez que les fichiers correspondent au périmètre validé.
+- [ ] Publiez [readme.md](readme.md) comme page d'accueil.
 
 #### Critères de réussite
 
-- Le dépôt est privé.
-- Le dépôt contient `tailscale-nym/`, `adguard/` et la documentation.
-- Aucun secret n'est présent dans le dépôt.
-- [readme.md](readme.md) est la page d'accueil.
+- [ ] Le dépôt est privé.
+- [ ] Le dépôt contient `tailscale-nym/`, `adguard/` et la documentation.
+- [ ] Aucun secret n'est présent dans le dépôt.
+- [ ] [readme.md](readme.md) est la page d'accueil.
 
 ## Les défauts connus, non corrigés
 
@@ -464,14 +504,14 @@ La commande exige une désassociation Wi-Fi. La correction demande une présence
 
 #### Étapes
 
-- Avec quelqu'un sur place, exécutez `iw reg set FR`.
-- Vérifiez `iw reg get` après l'exécution.
+- [ ] Avec quelqu'un sur place, exécutez `iw reg set FR`.
+- [ ] Vérifiez `iw reg get` après l'exécution.
 
 #### Critères de réussite
 
-- `iw reg get` affiche le domaine `FR`.
-- Les canaux ne restent pas tous en `PASSIVE-SCAN`.
-- La liaison Wi-Fi fonctionne après la commande.
+- [ ] `iw reg get` affiche le domaine `FR`.
+- [ ] Les canaux ne restent pas tous en `PASSIVE-SCAN`.
+- [ ] La liaison Wi-Fi fonctionne après la commande.
 
 ### La limite de wpa_supplicant
 
@@ -485,16 +525,16 @@ Cinq redémarrages en 30 minutes arrêtent la supervision. Le défaut laisse le 
 
 #### Étapes
 
-- Identifiez la cause des redémarrages de `wpa_supplicant`.
-- Corrigez la cause pour rester sous la limite.
-- Vérifiez le comportement du superviseur après la correction.
-- Vérifiez la liaison Wi-Fi après plusieurs redémarrages.
+- [ ] Identifiez la cause des redémarrages de `wpa_supplicant`.
+- [ ] Corrigez la cause pour rester sous la limite.
+- [ ] Vérifiez le comportement du superviseur après la correction.
+- [ ] Vérifiez la liaison Wi-Fi après plusieurs redémarrages.
 
 #### Critères de réussite
 
-- `wpa_supplicant` ne dépasse pas la limite de supervision.
-- Le superviseur relance le service sans renoncer.
-- Le serveur garde sa liaison Wi-Fi.
+- [ ] `wpa_supplicant` ne dépasse pas la limite de supervision.
+- [ ] Le superviseur relance le service sans renoncer.
+- [ ] Le serveur garde sa liaison Wi-Fi.
 
 ### La dépendance DNS du Mac
 
@@ -508,16 +548,16 @@ Le Wi-Fi instable justifie le contournement. Le changement attend une décision 
 
 #### Étapes
 
-- Demandez l'accord avant de modifier le DNS du Mac.
-- Gardez MagicDNS comme résolveur principal.
-- Ajoutez un résolveur public en second.
-- Vérifiez la résolution des noms après le changement.
+- [ ] Demandez l'accord avant de modifier le DNS du Mac.
+- [ ] Gardez MagicDNS comme résolveur principal.
+- [ ] Ajoutez un résolveur public en second.
+- [ ] Vérifiez la résolution des noms après le changement.
 
 #### Critères de réussite
 
-- MagicDNS reste le résolveur principal.
-- Un résolveur public répond en second.
-- La résolution des noms fonctionne hors du tailnet.
+- [ ] MagicDNS reste le résolveur principal.
+- [ ] Un résolveur public répond en second.
+- [ ] La résolution des noms fonctionne hors du tailnet.
 
 ### Le redémarrage non revérifié depuis 2026-10-05
 
@@ -531,18 +571,18 @@ Ce test suit toute reconfiguration réseau. Ici, la reconfiguration du 2026-10-0
 
 #### Étapes
 
-- Redémarrez le serveur avec `doas reboot`.
-- Reconnectez-vous au serveur après le redémarrage.
-- Appliquez les contrôles de [maintenance.md](maintenance.md), section « Le redémarrage de l'hôte ».
-- Vérifiez le relais selon [maintenance.md](maintenance.md), section « La vérification des sorties ».
+- [ ] Redémarrez le serveur avec `doas reboot`.
+- [ ] Reconnectez-vous au serveur après le redémarrage.
+- [ ] Appliquez les contrôles de [maintenance.md](maintenance.md), section « Le redémarrage de l'hôte ».
+- [ ] Vérifiez le relais selon [maintenance.md](maintenance.md), section « La vérification des sorties ».
 
 #### Critères de réussite
 
-- Les conteneurs `tailscale`, `<OLD-NETNS>`, `nym` et `<OLD-NODE-EXIT-NYMVPN>` sont `Up`.
-- `<OLD-SERVER-NAME>` garde `<TAILNET-IP-EXIT-DIRECT>`.
-- `<OLD-NODE-EXIT-NYMVPN>` garde `<TAILNET-IP-EXIT-NYMVPN>`.
-- La route vers la passerelle utilise `eth0`.
-- Les deux sorties fonctionnent après le redémarrage.
+- [ ] Les conteneurs `tailscale`, `<OLD-NETNS>`, `nym` et `<OLD-NODE-EXIT-NYMVPN>` sont `Up`.
+- [ ] `<OLD-SERVER-NAME>` garde `<TAILNET-IP-EXIT-DIRECT>`.
+- [ ] `<OLD-NODE-EXIT-NYMVPN>` garde `<TAILNET-IP-EXIT-NYMVPN>`.
+- [ ] La route vers la passerelle utilise `eth0`.
+- [ ] Les deux sorties fonctionnent après le redémarrage.
 
 ## Le conditionnel
 
@@ -560,16 +600,16 @@ Les services restent accessibles par le tailnet seulement. Le besoin réel d'exp
 
 #### Étapes
 
-- Obtenez la décision explicite de l'utilisateur.
-- Installez un reverse-proxy.
-- Déclarez un domaine pour les services.
-- Vérifiez l'accès public de chaque service.
+- [ ] Obtenez la décision explicite de l'utilisateur.
+- [ ] Installez un reverse-proxy.
+- [ ] Déclarez un domaine pour les services.
+- [ ] Vérifiez l'accès public de chaque service.
 
 #### Critères de réussite
 
-- Chaque service exposé a un besoin documenté.
-- L'exposition utilise un reverse-proxy et un domaine.
-- L'accès par le tailnet reste possible.
+- [ ] Chaque service exposé a un besoin documenté.
+- [ ] L'exposition utilise un reverse-proxy et un domaine.
+- [ ] L'accès par le tailnet reste possible.
 
 ### La redondance du disque
 
@@ -583,15 +623,15 @@ La redondance sera décidée quand le disque contiendra des données précieuses
 
 #### Étapes
 
-- Ajoutez la redondance du disque.
-- Ajoutez la sauvegarde des données.
-- Vérifiez la restauration depuis la sauvegarde.
+- [ ] Ajoutez la redondance du disque.
+- [ ] Ajoutez la sauvegarde des données.
+- [ ] Vérifiez la restauration depuis la sauvegarde.
 
 #### Critères de réussite
 
-- Le disque dispose d'une redondance.
-- Les données sont sauvegardées.
-- Une restauration est réussie.
+- [ ] Le disque dispose d'une redondance.
+- [ ] Les données sont sauvegardées.
+- [ ] Une restauration est réussie.
 
 ### La nappe de la batterie
 
@@ -605,14 +645,14 @@ La batterie est gonflée et le châssis est déformé. L'opération est planifi�
 
 #### Étapes
 
-- Planifiez l'opération sans urgence.
-- Débranchez la nappe de la batterie.
-- Vérifiez le démarrage du serveur après le débranchement.
+- [ ] Planifiez l'opération sans urgence.
+- [ ] Débranchez la nappe de la batterie.
+- [ ] Vérifiez le démarrage du serveur après le débranchement.
 
 #### Critères de réussite
 
-- La nappe est débranchée.
-- Le serveur démarre sans la batterie.
+- [ ] La nappe est débranchée.
+- [ ] Le serveur démarre sans la batterie.
 
 ### Le nettoyage des images Docker
 
@@ -626,15 +666,15 @@ Cette opération reste facultative. Aucune image utilisée ne doit être supprim
 
 #### Étapes
 
-- Listez les images Docker inutilisées.
-- Retirez uniquement les images sans conteneur.
-- Vérifiez le redémarrage des services après le nettoyage.
+- [ ] Listez les images Docker inutilisées.
+- [ ] Retirez uniquement les images sans conteneur.
+- [ ] Vérifiez le redémarrage des services après le nettoyage.
 
 #### Critères de réussite
 
-- Les images inutilisées sont retirées.
-- Les images des services restent disponibles.
-- Les services redémarrent sans erreur d'image.
+- [ ] Les images inutilisées sont retirées.
+- [ ] Les images des services restent disponibles.
+- [ ] Les services redémarrent sans erreur d'image.
 
 ### La réinscription du nœud `<OLD-SERVER-NAME>`
 
@@ -648,13 +688,13 @@ L'utilisateur fournit une clé d'authentification. Son accord précède toute é
 
 #### Étapes
 
-- Obtenez la clé d'authentification de l'utilisateur.
-- Recréez le conteneur avec [maintenance.md](maintenance.md), section « La mise à jour de la voie directe ».
-- Vérifiez que le nœud reprend `<TAILNET-IP-EXIT-DIRECT>`.
-- Consignez la reprise sans recopier la clé.
+- [ ] Obtenez la clé d'authentification de l'utilisateur.
+- [ ] Recréez le conteneur avec [maintenance.md](maintenance.md), section « La mise à jour de la voie directe ».
+- [ ] Vérifiez que le nœud reprend `<TAILNET-IP-EXIT-DIRECT>`.
+- [ ] Consignez la reprise sans recopier la clé.
 
 #### Critères de réussite
 
-- Le nœud `<OLD-SERVER-NAME>` est de nouveau approuvé comme exit node.
-- La clé ne figure dans aucun fichier suivi par Git.
-- Le résultat est consigné dans [logbook.md](logbook.md).
+- [ ] Le nœud `<OLD-SERVER-NAME>` est de nouveau approuvé comme exit node.
+- [ ] La clé ne figure dans aucun fichier suivi par Git.
+- [ ] Le résultat est consigné dans [logbook.md](logbook.md).
