@@ -4,9 +4,10 @@
 # Tout est en lecture seule. Aucun conteneur n est cree, arrete ou supprime.
 # Aucun nom de conteneur n est utilise comme motif de suppression.
 #
-# Connexion : ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>
-# Copiez ce fichier sur le serveur, par exemple dans /tmp :
-# Puis :      sh /tmp/verif-adguard.sh
+#
+#   scp adguard/verif.sh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>:/tmp/
+#   ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>
+#   sh /tmp/verif.sh
 #
 # doas reclame un tty et le mot de passe. Lance ce script depuis une vraie
 # session SSH interactive, pas depuis un pipe.
@@ -95,6 +96,29 @@ doas docker exec nym nft list chain inet nym forward 2>&1 | tail -20
 
 say "C2. Memes regles sur la chaine output, pour comparaison"
 doas docker exec nym nft list chain inet nym output 2>&1 | tail -12
+
+say "C3. Chaine input de nym : quelles interfaces sont acceptees ?"
+# C est le test qui repond a la question "pourquoi pas brancher AdGuard
+# directement dans <OLD-NETNS>".
+#
+# Nym pose policy drop sur input. Si aucune regle n accepte iif "tailscale0",
+# alors une requete DNS venant du tailnet vers un service qui tournerait dans
+# ce netns tombe sur le drop final. Le service serait injoignable, sans erreur
+# visible : juste un delai.
+#
+# Attendu aujourd hui : seulement eth0 (wireguard + retour etabli).
+doas docker exec nym nft list chain inet nym input 2>&1 | tail -20
+
+say "C4. Le netns <OLD-SERVER-NAME> accepte-t-il des requetes entrantes sur tailscale0 ?"
+# Recherche directe d une regle acceptee sur tailscale0 dans input.
+if doas docker exec nym nft list chain inet nym input 2>/dev/null \
+        | grep -q 'iif "tailscale0"'; then
+    echo "OUI : une regle input accepte tailscale0"
+    doas docker exec nym nft list chain inet nym input 2>/dev/null | grep 'iif "tailscale0"'
+else
+    echo "NON : aucun accept sur tailscale0 dans la chaine input"
+    echo "=> un service ecouteur dans ce netns serait injoignable depuis le tailnet"
+fi
 
 # ------------------------------------------------------------ D. ETAT
 
