@@ -108,29 +108,6 @@ Le mode d'accès décide du pare-feu et de la sortie du compagnon. Aucun mode n'
 - [ ] Les tâches AdGuard Home et WoL citent un mode choisi.
 - [ ] Le glossaire définit le terme « mode d'accès ».
 
-### La procédure générique de déploiement d'un microservice
-
-#### Objectif
-
-Écrire une procédure réutilisable pour créer, transférer et construire un microservice. [maintenance.md](maintenance.md) ne décrit que la voie 2.
-
-#### Conditions
-
-Les sources du service existent dans le dépôt. L'utilisateur donne son accord avant toute écriture sur le serveur.
-
-#### Étapes
-
-- [ ] Ajoutez une section qui crée le répertoire du projet dans `/opt`.
-- [ ] Ajoutez le transfert des sources depuis le Mac.
-- [ ] Ajoutez la construction de l'image et la création du conteneur.
-- [ ] Indiquez où exécuter `adguard/verif.sh` et son résultat attendu.
-
-#### Critères de réussite
-
-- [ ] La procédure s'applique à un projet autre que la voie 2.
-- [ ] Chaque étape nomme sa commande et son résultat attendu.
-- [ ] `adguard/verif.sh` a un résultat attendu documenté.
-
 ### Le trajet DNS de chaque voie
 
 #### Objectif
