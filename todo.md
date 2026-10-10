@@ -216,15 +216,15 @@ Projets, dossiers et volumes :
 
 #### Étapes
 
-- [ ] Préparation : commit du dépôt, lecture des noms réels des volumes (`doas docker volume ls`), vérification de l'SSH par le LAN (`ssh <ADMIN-ACCOUNT>@<LAN-IP-SERVER>`).
-- [ ] Palier A — voie 2 :
-  - [ ] Arrêt du projet : `docker compose down` dans `/opt/tailscale-nym`.
-  - [ ] Renommage des volumes : `docker volume rename tailscale-nym_state exit-nymvpn_state`, idem pour `tailscale-nym_nym-data` et `tailscale-nym_ts-sock`.
-  - [ ] Déplacement du dossier : `/opt/tailscale-nym` → `/opt/exit-nymvpn`.
-  - [ ] Mise à jour de `docker-compose.yaml` : `name: exit-nymvpn` ; services `netns` → `netns-nymvpn` (conteneur et `hostname`), `nym` → `tunnel-nymvpn`, `tailscale` → `exit-nymvpn` ; références `network_mode: "service:netns-nymvpn"` et `depends_on` suivent ; `--hostname=exit-nymvpn`.
-  - [ ] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
-  - [ ] Porte A : `docker ps` aux noms exacts (aucun ancien) ; IP tailnet inchangée (`<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`) ; `nym-vpnc` Connected ; exit node approuvé ; relais vérifié (loop.sh sur la cible `exit-nymvpn`) ; resélection de l'exit node dans l'app côté clients ; grep des anciens identifiants (`<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>`, `<OLD-NETNS>`, clés `nym` / `netns` / `tailscale`) → 0 hit, hors mots-produits, machine `<OLD-SERVER-NAME>` et historique.
-  - [ ] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
+- [x] Préparation : commit du dépôt, lecture des noms réels des volumes (`doas docker volume ls`), vérification de l'SSH par le LAN (`ssh <ADMIN-ACCOUNT>@<LAN-IP-SERVER>`).
+- [x] Palier A — voie 2 :
+  - [x] Arrêt du projet : `docker compose down` dans `/opt/tailscale-nym`.
+  - [x] Renommage des volumes : `docker volume rename tailscale-nym_state exit-nymvpn_state`, idem pour `tailscale-nym_nym-data` et `tailscale-nym_ts-sock`. *(CLI 29.5.3 sans `volume rename` → migration par `volume create` + copie byte-identique `cp -a` + `diff -r` + sha256 ; anciens volumes conservés jusqu'au vert final.)*
+  - [x] Déplacement du dossier : `/opt/tailscale-nym` → `/opt/exit-nymvpn`.
+  - [x] Mise à jour de `docker-compose.yaml` : `name: exit-nymvpn` ; services `netns` → `netns-nymvpn` (conteneur et `hostname`), `nym` → `tunnel-nymvpn`, `tailscale` → `exit-nymvpn` ; références `network_mode: "service:netns-nymvpn"` et `depends_on` suivent ; `--hostname=exit-nymvpn`.
+  - [x] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
+  - [ ] Porte A : côté serveur ✓ (`docker ps` aux noms exacts, IP `<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`, `nym-vpnc` Connected, exit node approuvé, grep des anciens identifiants → 0 hit) ; **côté clients en attente** : clé d'auth Tailscale fraîche pour loop.sh sur la cible `exit-nymvpn` + re-sélection de l'exit node dans l'app.
+  - [x] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
 - [ ] Palier B — voie 1 :
   - [ ] Revérifier l'SSH par le LAN.
   - [ ] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state`, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.

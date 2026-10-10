@@ -55,17 +55,17 @@ La route par défaut doit utiliser une liaison disponible et la passerelle `<LAN
 
 ## L'état de la voie 2
 
-Le conteneur `nym` fournit le tunnel. Le conteneur `<OLD-NODE-EXIT-NYMVPN>` fournit le nœud Tailscale. Les deux partagent l'espace réseau de `<OLD-NETNS>`.
+Le conteneur `tunnel-nymvpn` fournit le tunnel. Le conteneur `exit-nymvpn` fournit le nœud Tailscale. Les deux partagent l'espace réseau de `netns-nymvpn`.
 
 Ne lancez jamais `nym-vpnd -v`. Ce mode affiche la graine Nym dans les journaux. Les règles de protection des secrets sont dans [guidelines.md](guidelines.md), section « Les secrets ».
 
 Sur le serveur, relevez l'état du tunnel, du nœud et de la sortie :
 
 ```sh
-doas docker exec nym nym-vpnc status --table-style blank
-doas docker exec <OLD-NODE-EXIT-NYMVPN> tailscale status
-doas docker exec nym curl -s --max-time 20 https://api.ipify.org
-doas docker logs nym 2>&1 | grep -F '[superviseur]'
+doas docker exec tunnel-nymvpn nym-vpnc status --table-style blank
+doas docker exec exit-nymvpn tailscale status
+doas docker exec tunnel-nymvpn curl -s --max-time 20 https://api.ipify.org
+doas docker logs tunnel-nymvpn 2>&1 | grep -F '[superviseur]'
 ```
 
 Le tunnel doit afficher `Connected`. Le nœud doit apparaître dans le tailnet sans avertissement de santé. La requête HTTP doit renvoyer une adresse publique. La comparaison avec la sortie directe suit la section « La vérification des sorties ».
@@ -76,25 +76,25 @@ Cette vérification compare la sortie directe et la sortie Nym depuis l'iPhone. 
 
 Depuis l'iPhone, sélectionnez `<OLD-SERVER-NAME>` dans l'application Tailscale. Ouvrez `https://api.ipify.org`. Notez l'adresse affichée comme témoin direct.
 
-Sélectionnez ensuite `<OLD-NODE-EXIT-NYMVPN>`. Ouvrez la même adresse. Vérifiez que l'adresse affichée diffère du témoin direct.
+Sélectionnez ensuite `exit-nymvpn`. Ouvrez la même adresse. Vérifiez que l'adresse affichée diffère du témoin direct.
 
 ## La vérification du routage de la voie 2
 
-Ces contrôles s'exécutent sur le serveur, dans l'espace réseau partagé par `nym` et `<OLD-NODE-EXIT-NYMVPN>`. Ils décrivent le routage avec le tunnel connecté. Les règles applicables sont dans [guidelines.md](guidelines.md).
+Ces contrôles s'exécutent sur le serveur, dans l'espace réseau partagé par `tunnel-nymvpn` et `exit-nymvpn`. Ils décrivent le routage avec le tunnel connecté. Les règles applicables sont dans [guidelines.md](guidelines.md).
 
 Après une mise à jour de Tailscale, relevez les règles :
 
 ```sh
-doas docker exec nym ip rule
+doas docker exec tunnel-nymvpn ip rule
 ```
 
 Relevez le numéro de table dans la règle de retour vers `100.64.0.0/10`. Dans les commandes suivantes, remplacez `52` si ce numéro diffère. Vérifiez les tables :
 
 ```sh
 TABLE_TAILSCALE=52
-doas docker exec nym ip route show table "$TABLE_TAILSCALE"
-doas docker exec nym ip route show table 333
-doas docker exec nym ip route show table 1000
+doas docker exec tunnel-nymvpn ip route show table "$TABLE_TAILSCALE"
+doas docker exec tunnel-nymvpn ip route show table 333
+doas docker exec tunnel-nymvpn ip route show table 1000
 ```
 
 La règle de retour vers le tailnet précède la règle directe du superviseur. Les deux précèdent les règles Nym. La table Tailscale porte les routes vers les pairs, sans route de rejet `0.0.0.0/1`. La table 333 pointe sur `tun0`. La table 1000 porte la sortie directe par `eth0`.
@@ -102,7 +102,7 @@ La règle de retour vers le tailnet précède la règle directe du superviseur. 
 Vérifiez le chemin vers une adresse publique avec cette commande :
 
 ```sh
-doas docker exec nym ip route get 8.8.8.8
+doas docker exec tunnel-nymvpn ip route get 8.8.8.8
 ```
 
 La réponse attendue mentionne `tun0` et la table 333. Le mécanisme fail-closed est décrit dans [architecture.md](architecture.md), section « Le routage ». Cette lecture vérifie le chemin choisi avec le tunnel connecté.
@@ -110,7 +110,7 @@ La réponse attendue mentionne `tun0` et la table 333. Le mécanisme fail-closed
 Vérifiez aussi le chemin du trafic marqué des clients avec cette commande :
 
 ```sh
-doas docker exec nym ip route get 9.9.9.9 from <TAILNET-IP-EXIT-NYMVPN> mark 0x40000
+doas docker exec tunnel-nymvpn ip route get 9.9.9.9 from <TAILNET-IP-EXIT-NYMVPN> mark 0x40000
 ```
 
 La réponse attendue mentionne `tun0` et la table 333. La marque `0x40000` distingue le trafic relayé des clients. La sortie directe du contrôle Tailscale utilise la marque `0x80000`.
@@ -121,7 +121,7 @@ Le résolveur interne de Nym répond, mais le port 53 vers l'extérieur est refu
 
 Au démarrage, Nym tente de réécrire `src_valid_mark` et `arp_ignore` dans `/proc/sys`. Le système de fichiers est en lecture seule. Le journal peut donc afficher `Failed to apply ...: Read-only file system`.
 
-Les valeurs sont déjà posées par les sysctl du service `netns`. Ce message décrit un refus de réécriture. Il ne suffit pas à établir une panne du tunnel.
+Les valeurs sont déjà posées par les sysctl du service `netns-nymvpn`. Ce message décrit un refus de réécriture. Il ne suffit pas à établir une panne du tunnel.
 
 ## Le diagnostic du lien filaire
 
@@ -139,7 +139,7 @@ Lorsque le câble est connecté, `Link detected` doit valoir `yes`. `eth0` doit 
 
 ## Le client de diagnostic sur le Mac
 
-[test-client.sh](tailscale-nym/test-client.sh) lance le conteneur Tailscale de test `ts-client`. [loop.sh](tailscale-nym/loop.sh) teste le relais entre les deux voies. Les commandes de cette section s'exécutent sur le Mac, dans son contexte Docker de diagnostic.
+[test-client.sh](exit-nymvpn/test-client.sh) lance le conteneur Tailscale de test `ts-client`. [loop.sh](exit-nymvpn/loop.sh) teste le relais entre les deux voies. Les commandes de cette section s'exécutent sur le Mac, dans son contexte Docker de diagnostic.
 
 Vérifiez le contexte Docker et la présence du conteneur :
 
@@ -167,16 +167,16 @@ Les deux commandes doivent renvoyer un chemin. La boucle de diagnostic peut alor
 Lancez le client de test avec la clé d'authentification fournie par l'utilisateur :
 
 ```sh
-sh tailscale-nym/test-client.sh <clé> <OLD-NODE-EXIT-NYMVPN>
+sh exit-nymvpn/test-client.sh <clé> exit-nymvpn
 ```
 
 Lancez ensuite la boucle de relais :
 
 ```sh
-bash tailscale-nym/loop.sh
+bash exit-nymvpn/loop.sh
 ```
 
-La boucle contrôle d'abord `<OLD-SERVER-NAME>`, puis la cible `<OLD-NODE-EXIT-NYMVPN>`. Deux verdicts `VERT` indiquent un relais correct. Un verdict `ROUGE` sur la cible signale un défaut du relais.
+La boucle contrôle d'abord `<OLD-SERVER-NAME>`, puis la cible `exit-nymvpn`. Deux verdicts `VERT` indiquent un relais correct. Un verdict `ROUGE` sur la cible signale un défaut du relais.
 
 ## La sortie d'un microservice
 
@@ -191,7 +191,7 @@ SERVICE_TAILSCALE='nom-du-conteneur-compagnon'
 Pour la sortie Nym, lancez cette commande sur le serveur :
 
 ```sh
-doas docker exec "$SERVICE_TAILSCALE" tailscale set --exit-node=<OLD-NODE-EXIT-NYMVPN>
+doas docker exec "$SERVICE_TAILSCALE" tailscale set --exit-node=exit-nymvpn
 ```
 
 Pour la sortie directe, lancez cette commande :
@@ -223,15 +223,15 @@ Après un redémarrage, reconnectez-vous au serveur. Vérifiez les conteneurs, l
 ```sh
 doas docker ps -a --format '{{.Names}} {{.Status}}'
 doas docker exec tailscale tailscale ip -4
-doas docker exec <OLD-NODE-EXIT-NYMVPN> tailscale ip -4
-doas docker logs nym 2>&1 | grep -F '[superviseur]'
+doas docker exec exit-nymvpn tailscale ip -4
+doas docker logs tunnel-nymvpn 2>&1 | grep -F '[superviseur]'
 doas rc-status default | grep uplink-guard
 ip -4 addr show dev eth0
 ip -4 addr show dev wlan0
 ip -4 route get <LAN-GATEWAY-IP>
 ```
 
-Les conteneurs `tailscale`, `<OLD-NETNS>`, `nym` et `<OLD-NODE-EXIT-NYMVPN>` doivent être `Up`. `<OLD-SERVER-NAME>` doit garder `<TAILNET-IP-EXIT-DIRECT>`. `<OLD-NODE-EXIT-NYMVPN>` doit garder `<TAILNET-IP-EXIT-NYMVPN>`. Le superviseur doit journaliser la reconnexion. Le gardien `uplink-guard` doit Started dans le runlevel `default`. `eth0` doit porter `<LAN-IP-SERVER>`. `wlan0` doit garder `<LAN-IP-WIFI>`. La route vers `<LAN-GATEWAY-IP>` doit utiliser `eth0`. La section « La vérification des sorties » vérifie ensuite le relais.
+Les conteneurs `tailscale`, `netns-nymvpn`, `tunnel-nymvpn` et `exit-nymvpn` doivent être `Up`. `<OLD-SERVER-NAME>` doit garder `<TAILNET-IP-EXIT-DIRECT>`. `exit-nymvpn` doit garder `<TAILNET-IP-EXIT-NYMVPN>`. Le superviseur doit journaliser la reconnexion. Le gardien `uplink-guard` doit Started dans le runlevel `default`. `eth0` doit porter `<LAN-IP-SERVER>`. `wlan0` doit garder `<LAN-IP-WIFI>`. La route vers `<LAN-GATEWAY-IP>` doit utiliser `eth0`. La section « La vérification des sorties » vérifie ensuite le relais.
 
 ## La mise à jour du système
 
@@ -281,7 +281,7 @@ Cette procédure prépare une mise à jour d'un projet existant. Elle transfère
 Dans une session SSH, créez un répertoire temporaire :
 
 ```sh
-DEPLOY_DIR=$(mktemp -d "$HOME/tailscale-nym-deploy.XXXXXX")
+DEPLOY_DIR=$(mktemp -d "$HOME/exit-nymvpn-deploy.XXXXXX")
 printf '%s\n' "$DEPLOY_DIR"
 ```
 
@@ -291,11 +291,11 @@ Depuis la racine du dépôt sur le Mac, copiez les sources :
 
 ```sh
 DEPLOY_DIR='CHEMIN_RELEVE_SUR_LE_SERVEUR'
-scp tailscale-nym/Dockerfile \
-    tailscale-nym/Dockerfile.tailscale \
-    tailscale-nym/nym-entrypoint.sh \
-    tailscale-nym/49-nymvpn.rules \
-    tailscale-nym/docker-compose.yaml \
+scp exit-nymvpn/Dockerfile \
+    exit-nymvpn/Dockerfile.tailscale \
+    exit-nymvpn/nym-entrypoint.sh \
+    exit-nymvpn/49-nymvpn.rules \
+    exit-nymvpn/docker-compose.yaml \
     "<ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>:$DEPLOY_DIR/"
 ```
 
@@ -307,33 +307,33 @@ doas cp "$DEPLOY_DIR/Dockerfile" \
     "$DEPLOY_DIR/nym-entrypoint.sh" \
     "$DEPLOY_DIR/49-nymvpn.rules" \
     "$DEPLOY_DIR/docker-compose.yaml" \
-    /opt/tailscale-nym/
+    /opt/exit-nymvpn/
 ```
 
-Les cinq fichiers doivent rejoindre `/opt/tailscale-nym/` sans erreur de copie. Cette étape ne reconstruit pas les images. La procédure suivante applique les changements aux services concernés.
+Les cinq fichiers doivent rejoindre `/opt/exit-nymvpn/` sans erreur de copie. Cette étape ne reconstruit pas les images. La procédure suivante applique les changements aux services concernés.
 
 ## La reconstruction de la voie 2
 
-Les noms de services Compose sont `netns`, `nym` et `tailscale`. Leurs conteneurs sont `<OLD-NETNS>`, `nym` et `<OLD-NODE-EXIT-NYMVPN>`. Le projet vit dans `/opt/tailscale-nym`.
+Les noms de services Compose sont `netns-nymvpn`, `tunnel-nymvpn` et `exit-nymvpn`. Leurs conteneurs portent les mêmes noms. Le projet vit dans `/opt/exit-nymvpn`.
 
-Si seule l'image ou l'entrypoint Nym change, recréez uniquement `nym` :
+Si seule l'image ou l'entrypoint Nym change, recréez uniquement `tunnel-nymvpn` :
 
 ```sh
-cd /opt/tailscale-nym
-doas docker compose build nym
-doas docker compose up -d --no-deps nym
+cd /opt/exit-nymvpn
+doas docker compose build tunnel-nymvpn
+doas docker compose up -d --no-deps tunnel-nymvpn
 ```
 
-Le conteneur `<OLD-NETNS>` doit conserver son espace réseau. Le nœud `<OLD-NODE-EXIT-NYMVPN>` doit garder son identité. Le superviseur doit reconnecter le tunnel.
+Le conteneur `netns-nymvpn` doit conserver son espace réseau. Le nœud `exit-nymvpn` doit garder son identité. Le superviseur doit reconnecter le tunnel.
 
 Si l'image Tailscale ou la configuration de l'espace partagé change, reconstruisez et recréez les trois services :
 
 ```sh
-cd /opt/tailscale-nym
-doas docker compose build tailscale
-doas docker compose build nym
-doas docker compose up -d --force-recreate netns nym tailscale
-doas docker inspect -f '{{.NetworkSettings.SandboxKey}}' <OLD-NETNS>
+cd /opt/exit-nymvpn
+doas docker compose build exit-nymvpn
+doas docker compose build tunnel-nymvpn
+doas docker compose up -d --force-recreate netns-nymvpn tunnel-nymvpn exit-nymvpn
+doas docker inspect -f '{{.NetworkSettings.SandboxKey}}' netns-nymvpn
 ```
 
 L'inspection doit afficher le chemin de l'espace réseau du conteneur recréé. Les volumes conservent les identités et les données Nym. Les sections « L'état de la voie 2 » et « La vérification du routage de la voie 2 » vérifient la reprise.

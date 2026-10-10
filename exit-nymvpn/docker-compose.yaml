@@ -1,0 +1,95 @@
+name: exit-nymvpn
+
+# Pourquoi un conteneur netns dedie :
+#
+# exit-nymvpn partage le namespace reseau de tunnel-nymvpn avec
+# network_mode: "service:netns-nymvpn". Un namespace appartient au conteneur
+# qui le cree et il est detruit quand ce conteneur s'arrete. Un simple
+# "compose restart tunnel-nymvpn" recree donc un namespace neuf, et
+# tailscaled, reste accroche a l'ancien, perd toute interface : Health devient
+# "Tailscale cannot connect because the network is down", et le client perd
+# Internet sans qu'aucune erreur n'apparaisse cote tunnel-nymvpn.
+#
+# netns-nymvpn ne fait rien d'autre que tenir le namespace. Il ne redemarre
+# jamais tout seul, donc tunnel-nymvpn et exit-nymvpn peuvent etre recrees
+# independamment sans casser l'autre. Le jour ou netns-nymvpn redemarre, il
+# faut recreer les trois.
+
+services:
+  netns-nymvpn:
+    image: local/nym-vpn-client:2026.12.4
+    container_name: netns-nymvpn
+    hostname: netns-nymvpn
+    entrypoint: ["sleep", "infinity"]
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.default.src_valid_mark=1
+      - net.ipv4.conf.default.arp_ignore=1
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+    restart: unless-stopped
+
+  tunnel-nymvpn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/nym-vpn-client:2026.12.4
+    container_name: tunnel-nymvpn
+    network_mode: "service:netns-nymvpn"
+    depends_on:
+      - netns-nymvpn
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    # ts-sock : socket partage avec le conteneur exit-nymvpn. Le superviseur
+    # doit connaitre le port wireguard de tailscaled. Chaque conteneur a son
+    # propre espace de processus : sans ce volume, le superviseur ne voit pas
+    # tailscaled, meme si les deux partagent le meme espace reseau.
+    volumes:
+      - ./etc-nym:/etc/nym
+      - nym-data:/var/lib/nym-vpnd
+      - ts-sock:/var/run/tailscale
+    restart: unless-stopped
+
+  exit-nymvpn:
+    build:
+      context: .
+      dockerfile: Dockerfile.tailscale
+    image: local/tailscale-nft:1.102.5
+    container_name: exit-nymvpn
+    network_mode: "service:netns-nymvpn"
+    depends_on:
+      - netns-nymvpn
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - state:/var/lib/tailscale
+      - ts-sock:/var/run/tailscale
+    environment:
+      - TS_USERSPACE=false
+      - TS_ACCEPT_DNS=false
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SOCKET=/var/run/tailscale/tailscaled.sock
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_EXTRA_ARGS=--advertise-exit-node --hostname=exit-nymvpn
+      # tunnel-nymvpn possede deja le pare-feu de ce netns, avec ses chaines
+      # en policy drop. Sans ceci, tailscaled installe ses propres chaines
+      # ts-forward et ts-postrouting, que tunnel-nymvpn recouvre ensuite : le
+      # forwarding client se fait nettoyer en silence. En mode auto,
+      # tailscaled n installe plus ses chaines, et l entrypoint ecrit les
+      # regles de relais lui-meme.
+      - TS_DEBUG_FIREWALL_MODE=auto
+    restart: unless-stopped
+
+volumes:
+  nym-data:
+  state:
+  ts-sock:

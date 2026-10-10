@@ -14,14 +14,18 @@
  │                                                              │
  │ ┌────────────────────────┐   ┌─────────────────────────────┐ │
  │ │ VOIE 1 : DIRECTE       │   │ VOIE 2 : ANONYMISÉE         │ │
- │ │ <OLD-SERVER-NAME> / tailscale       │   │ <OLD-NETNS> (espace partagé) │ │
+ │ │ <OLD-SERVER-NAME> / tailscale       │   │netns-nymvpn (espace partagé)│ │
  │ │ réseau de l'hôte       │   │                             │ │
- │ │                        │   │  ┌──────┐ ┌────────────┐    │ │
- │ └────────────▲───────────┘   │  │ nym  │ │ <OLD-NODE-EXIT-NYMVPN>   │    │ │
- │              │               │  │ tun0 │ │ tailscale0 │    │ │
- │              │               │  └──────┘ └────────────┘    │ │
- │              │               │                             │ │
- │              │               └──────────────▲──────────────┘ │
+ │ │                        │   │  ┌──────────────┐           │ │
+ │ └────────────▲───────────┘   │  │tunnel-nymvpn │           │ │
+ │ │            │           │   │  │tun0          │           │ │
+ │ │            │           │   │  └──────────────┘           │ │
+ │ │            │           │   │  ┌──────────────┐           │ │
+ │ │            │           │   │  │exit-nymvpn   │           │ │
+ │ │            │           │   │  │tailscale0    │           │ │
+ │ │            │           │   │  └──────────────┘           │ │
+ │ │            │           │   │                             │ │
+ │ │            │           │   └──────────────▲──────────────┘ │
  └──────────────┼──────────────────────────────┼────────────────┘
                 │                              │
                 └──────────────┬───────────────┘
@@ -56,7 +60,7 @@ Le serveur est le laptop `<SERVER-MODEL>`, dont le nom d'hôte est `<OLD-SERVER-
 
 ### Les conteneurs : Docker
 
-Docker 29.5.x héberge les services, regroupés en projets Compose v5.1.4. Le projet `/opt/tailscale` porte la voie directe. Le projet `/opt/tailscale-nym` porte la voie anonymisée.
+Docker 29.5.x héberge les services, regroupés en projets Compose v5.1.4. Le projet `/opt/tailscale` porte la voie directe. Le projet `/opt/exit-nymvpn` porte la voie anonymisée.
 
 Docker démarre avec le système. Les conteneurs portent une politique de redémarrage automatique. Les volumes conservent les identités Tailscale et les données Nym entre les recréations.
 
@@ -80,7 +84,7 @@ L'authentification utilise une clé seule. `PasswordAuthentication` vaut `no`. L
 
 ## Niveau 2 : les sorties Internet
 
-Le tailnet Bonnet2B1 contient deux exit nodes, `<OLD-SERVER-NAME>` et `<OLD-NODE-EXIT-NYMVPN>`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
+Le tailnet Bonnet2B1 contient deux exit nodes, `<OLD-SERVER-NAME>` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
 
 ### La sortie directe : tailscale / `<OLD-SERVER-NAME>`
 
@@ -90,27 +94,27 @@ Le projet compose vit dans `/opt/tailscale` et utilise l'image officielle Tailsc
 
 L'état du nœud vit dans le volume `state`, au chemin `/var/lib/tailscale`. Ce volume conserve son identité entre les redémarrages et les recréations. `<OLD-SERVER-NAME>` est approuvé comme exit node dans la console Tailscale.
 
-### L'espace réseau de la voie anonymisée : `<OLD-NETNS>`
+### L'espace réseau de la voie anonymisée : netns-nymvpn
 
-Le conteneur `<OLD-NETNS>` porte l'espace réseau de la voie anonymisée. Les conteneurs `nym` et `<OLD-NODE-EXIT-NYMVPN>` rejoignent cet espace. Ils partagent ses interfaces, ses tables de routage et ses règles nft.
+Le conteneur `netns-nymvpn` porte l'espace réseau de la voie anonymisée. Les conteneurs `tunnel-nymvpn` et `exit-nymvpn` rejoignent cet espace. Ils partagent ses interfaces, ses tables de routage et ses règles nft.
 
 L'interface `eth0` de cet espace porte `<DOCKER-INTERNAL-IP>` sur le réseau Docker. `tun0` donne accès au tunnel Nym. `tailscale0` donne accès aux appareils du tailnet. L'`eth0` de l'hôte reste une interface distincte.
 
-Le service `netns` pose les paramètres réseau partagés, dont `src_valid_mark` et `arp_ignore`. Sa définition est dans [docker-compose.yaml](tailscale-nym/docker-compose.yaml). Ce fichier définit aussi les deux services qui partagent l'espace.
+Le service `netns-nymvpn` pose les paramètres réseau partagés, dont `src_valid_mark` et `arp_ignore`. Sa définition est dans [docker-compose.yaml](exit-nymvpn/docker-compose.yaml). Ce fichier définit aussi les deux services qui partagent l'espace.
 
-### Le tunnel : nym
+### Le tunnel : tunnel-nymvpn
 
-Le conteneur `nym` fournit le tunnel Nym en mode fast. Le trafic traverse deux passerelles avant sa sortie Internet. L'adresse publique de sortie change avec les passerelles sélectionnées.
+Le conteneur `tunnel-nymvpn` fournit le tunnel Nym en mode fast. Le trafic traverse deux passerelles avant sa sortie Internet. L'adresse publique de sortie change avec les passerelles sélectionnées.
 
-Son image `local/nym-vpn-client:2026.12.4` utilise les binaires Linux Nym sur Debian bookworm. Le [Dockerfile](tailscale-nym/Dockerfile) décrit sa construction. La base et le tarball sont épinglés, et le tarball est vérifié par SHA-256.
+Son image `local/nym-vpn-client:2026.12.4` utilise les binaires Linux Nym sur Debian bookworm. Le [Dockerfile](exit-nymvpn/Dockerfile) décrit sa construction. La base et le tarball sont épinglés, et le tarball est vérifié par SHA-256.
 
-Le fichier [nym-entrypoint.sh](tailscale-nym/nym-entrypoint.sh) lance Dbus, polkit et `nym-vpnd`, puis supervise la connexion. La règle [49-nymvpn.rules](tailscale-nym/49-nymvpn.rules) autorise les actions Nym sur le socket local. La configuration persistante vit dans `etc-nym/nym-vpnd.json` sur le serveur.
+Le fichier [nym-entrypoint.sh](exit-nymvpn/nym-entrypoint.sh) lance Dbus, polkit et `nym-vpnd`, puis supervise la connexion. La règle [49-nymvpn.rules](exit-nymvpn/49-nymvpn.rules) autorise les actions Nym sur le socket local. La configuration persistante vit dans `etc-nym/nym-vpnd.json` sur le serveur.
 
 Les données Nym vivent dans le volume `nym-data`, monté dans `/var/lib/nym-vpnd`. La graine Nym est stockée dans `mainnet/mnemonic.json`, à l'intérieur de ce volume. Ce stockage est distinct de la configuration `etc-nym/nym-vpnd.json`.
 
 #### Le superviseur de connexion
 
-Le superviseur est une boucle dans l'entrypoint du conteneur `nym`. Il lance `nym-vpnd` en arrière-plan, puis boucle toutes les 30 secondes. Il demande la connexion tant que l'état n'est pas `Connected`.
+Le superviseur est une boucle dans l'entrypoint du conteneur `tunnel-nymvpn`. Il lance `nym-vpnd` en arrière-plan, puis boucle toutes les 30 secondes. Il demande la connexion tant que l'état n'est pas `Connected`.
 
 Il attend pendant les états transitoires et continue les tentatives de connexion. L'état stable `Disconnected` compte comme un échec, pas comme une transition. Il déclenche une tentative. Le superviseur rétablit les règles de routage et de pare-feu nécessaires au relais. Il relaie `SIGTERM` et `SIGINT` vers `nym-vpnd`.
 
@@ -122,13 +126,13 @@ Le résolveur interne de Nym répond. Nym refuse le port 53 vers l'extérieur pa
 
 La table porte une chaîne `nat`, accrochée à `postrouting`. Cette chaîne reste vide. Aucune chaîne nommée `postrouting` n'existe dans la table `inet nym`. La passerelle de sortie Nym fait le NAT du trafic relayé. Les réponses au tailnet suivent la règle de retour vers la table 52.
 
-### La sortie anonymisée : `<OLD-NODE-EXIT-NYMVPN>`
+### La sortie anonymisée : exit-nymvpn
 
-Le conteneur `<OLD-NODE-EXIT-NYMVPN>` porte le nœud Tailscale du même nom, en `<TAILNET-IP-EXIT-NYMVPN>`. Il utilise le mode noyau de Tailscale et l'espace réseau tenu par `<OLD-NETNS>`. Il est approuvé comme exit node dans la console Tailscale.
+Le conteneur `exit-nymvpn` porte le nœud Tailscale du même nom, en `<TAILNET-IP-EXIT-NYMVPN>`. Il utilise le mode noyau de Tailscale et l'espace réseau tenu par `netns-nymvpn`. Il est approuvé comme exit node dans la console Tailscale.
 
-L'image `local/tailscale-nft:1.102.5` utilise le backend nft d'iptables. Sa construction est décrite dans [Dockerfile.tailscale](tailscale-nym/Dockerfile.tailscale). Le volume `state` conserve l'identité du nœud.
+L'image `local/tailscale-nft:1.102.5` utilise le backend nft d'iptables. Sa construction est décrite dans [Dockerfile.tailscale](exit-nymvpn/Dockerfile.tailscale). Le volume `state` conserve l'identité du nœud.
 
-Le projet partagé vit dans `/opt/tailscale-nym`. Son fichier `.env` reste sur le serveur. Le fichier [.env.example](tailscale-nym/.env.example) décrit les variables du projet.
+Le projet partagé vit dans `/opt/exit-nymvpn`. Son fichier `.env` reste sur le serveur. Le fichier [.env.example](exit-nymvpn/.env.example) décrit les variables du projet.
 
 #### Le routage
 
@@ -138,7 +142,7 @@ La priorité `n` est la plus basse des deux priorités Nym. La règle de retour 
 
 La règle de retour dirige les destinations `100.64.0.0/10` vers la table 52. Cette table porte les routes vers les pairs du tailnet par `tailscale0`. Elle ne contient pas de route de rejet `0.0.0.0/1`. Le superviseur lit le numéro de la table dans les règles de Tailscale.
 
-Le trafic propre de Tailscale porte la marque `0x80000`. Cette marque couvre le contrôle, les relais DERP et les échanges WireGuard entre pairs. La règle directe du superviseur sélectionne cette marque avec le masque `0xff0000` et utilise la table 1000. Cette table sort par l'`eth0` de l'espace réseau `<OLD-NETNS>`, hors du tunnel. Le paquet traverse ensuite le pont Docker, puis l'`eth0` de l'hôte.
+Le trafic propre de Tailscale porte la marque `0x80000`. Cette marque couvre le contrôle, les relais DERP et les échanges WireGuard entre pairs. La règle directe du superviseur sélectionne cette marque avec le masque `0xff0000` et utilise la table 1000. Cette table sort par l'`eth0` de l'espace réseau `netns-nymvpn`, hors du tunnel. Le paquet traverse ensuite le pont Docker, puis l'`eth0` de l'hôte.
 
 Le superviseur marque le trafic relayé des clients avec `0x40000` dans le pare-feu. Cette marque échappe à la règle directe qui sélectionne `0x80000`. Pour une destination publique, la règle Nym dirige le trafic vers la table 333. La route par défaut de cette table utilise `tun0`. Elle porte une MTU de 1340 octets. Un paquet plus grand est jeté par le tunnel.
 

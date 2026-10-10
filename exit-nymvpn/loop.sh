@@ -1,5 +1,5 @@
 #!/bin/bash
-# Boucle de feedback pour <OLD-NODE-EXIT-NYMVPN>.
+# Boucle de feedback pour exit-nymvpn.
 #
 # Signal : l IP de sortie du client change-t-elle quand on selectionne
 # l exit node, et le client atteint-t-il Internet ?
@@ -60,7 +60,7 @@ egress_ip() {
 # sans exit node.
 ensure_client() {
   if ! docker inspect "$C" >/dev/null 2>&1; then
-    echo "Le conteneur $C n existe pas. Lancez d abord : ./test-client.sh <CLE> <OLD-NODE-EXIT-NYMVPN>" >&2
+    echo "Le conteneur $C n existe pas. Lancez d abord : ./test-client.sh <CLE> exit-nymvpn" >&2
     exit 2
   fi
   if docker exec "$C" sh -c 'command -v curl >/dev/null 2>&1 && command -v dig >/dev/null 2>&1'; then
@@ -116,7 +116,7 @@ ensure_client
 echo "=== controle : <OLD-SERVER-NAME>, exit node connu comme fonctionnel ==="
 run_case <OLD-SERVER-NAME>
 echo
-echo "=== cible : <OLD-NODE-EXIT-NYMVPN> ==="
-run_case <OLD-NODE-EXIT-NYMVPN>
+echo "=== cible : exit-nymvpn ==="
+run_case exit-nymvpn
 
 set_node ""

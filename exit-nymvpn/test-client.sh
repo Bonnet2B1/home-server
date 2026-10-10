@@ -1,5 +1,5 @@
 #!/bin/sh
-# Conteneur Tailscale servant de client de test pour <OLD-NODE-EXIT-NYMVPN>.
+# Conteneur Tailscale servant de client de test pour exit-nymvpn.
 # Il ne touche pas au Mac hote : seul le conteneur choisit l exit node.
 # Le Mac reste sur <OLD-SERVER-NAME>, donc la session de travail n est pas coupee.
 #
@@ -55,7 +55,7 @@ fi
 echo "== le noeud est-il visible dans le tailnet ? =="
 docker exec ts-client tailscale status 2>&1 | head -6
 
-echo "== choix de <OLD-NODE-EXIT-NYMVPN> comme exit node =="
+echo "== choix de exit-nymvpn comme exit node =="
 docker exec ts-client tailscale set --exit-node="$TARGET"
 sleep 10
 echo "exit node actif : $(docker exec ts-client tailscale debug prefs 2>/dev/null | grep -i exitnodeid | tr -d '\t ')"

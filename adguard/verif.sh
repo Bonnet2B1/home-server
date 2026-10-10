@@ -54,7 +54,7 @@ say "B1. Port 53 sortant depuis l espace reseau nym"
 # superviseur n insere que sa regle 0x80000. Le reject port 53 de nym
 # s applique donc. Attendu : refus.
 # Ce test ne dit RIEN du trafic relaye des clients. Voir B2.
-doas docker exec nym python3 -c '
+doas docker exec tunnel-nymvpn python3 -c '
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.settimeout(5)
@@ -69,9 +69,9 @@ say "B2. Amont DoH et DoT depuis l espace reseau nym"
 # 443 et 853 ne sont pas refuses par nym. Ce sont donc les deux choix surs
 # pour l amont d AdGuard quand la sortie est anonymisee.
 # DoH : 200 attendu. DoT : connexion TLS etablie attendue.
-doas docker exec nym sh -c \
+doas docker exec tunnel-nymvpn sh -c \
     'curl -s -o /dev/null -w "DoH 443 vers quad9 : HTTP %{http_code}\n" --max-time 20 https://dns.quad9.net/dns-query' 2>&1 | tail -2
-doas docker exec nym python3 -c '
+doas docker exec tunnel-nymvpn python3 -c '
 import socket, ssl
 try:
     s = socket.create_connection(("9.9.9.9", 853), timeout=10)
@@ -92,14 +92,14 @@ say "C1. Ordre reel des regles dans la chaine forward de nym"
 # Si elle est APRES, il est refuse et DoT/DoH devient obligatoire.
 #
 # nft liste dans l ordre d application. On lit donc l ordre reel.
-doas docker exec nym nft list chain inet nym forward 2>&1 | tail -20
+doas docker exec tunnel-nymvpn nft list chain inet nym forward 2>&1 | tail -20
 
 say "C2. Memes regles sur la chaine output, pour comparaison"
-doas docker exec nym nft list chain inet nym output 2>&1 | tail -12
+doas docker exec tunnel-nymvpn nft list chain inet nym output 2>&1 | tail -12
 
 say "C3. Chaine input de nym : quelles interfaces sont acceptees ?"
 # C est le test qui repond a la question "pourquoi pas brancher AdGuard
-# directement dans <OLD-NETNS>".
+# directement dans netns-nymvpn".
 #
 # Nym pose policy drop sur input. Si aucune regle n accepte iif "tailscale0",
 # alors une requete DNS venant du tailnet vers un service qui tournerait dans
@@ -107,14 +107,14 @@ say "C3. Chaine input de nym : quelles interfaces sont acceptees ?"
 # visible : juste un delai.
 #
 # Attendu aujourd hui : seulement eth0 (wireguard + retour etabli).
-doas docker exec nym nft list chain inet nym input 2>&1 | tail -20
+doas docker exec tunnel-nymvpn nft list chain inet nym input 2>&1 | tail -20
 
-say "C4. Le netns <OLD-SERVER-NAME> accepte-t-il des requetes entrantes sur tailscale0 ?"
+say "C4. Le netns netns-nymvpn accepte-t-il des requetes entrantes sur tailscale0 ?"
 # Recherche directe d une regle acceptee sur tailscale0 dans input.
-if doas docker exec nym nft list chain inet nym input 2>/dev/null \
+if doas docker exec tunnel-nymvpn nft list chain inet nym input 2>/dev/null \
         | grep -q 'iif "tailscale0"'; then
     echo "OUI : une regle input accepte tailscale0"
-    doas docker exec nym nft list chain inet nym input 2>/dev/null | grep 'iif "tailscale0"'
+    doas docker exec tunnel-nymvpn nft list chain inet nym input 2>/dev/null | grep 'iif "tailscale0"'
 else
     echo "NON : aucun accept sur tailscale0 dans la chaine input"
     echo "=> un service ecouteur dans ce netns serait injoignable depuis le tailnet"
@@ -124,12 +124,12 @@ fi
 
 say "D1. Les deux noeuds de sortie sont ils en ligne"
 doas docker exec tailscale tailscale status 2>&1 | head -3
-doas docker exec <OLD-NODE-EXIT-NYMVPN> tailscale status 2>&1 | head -3
+doas docker exec exit-nymvpn tailscale status 2>&1 | head -3
 
 say "D2. Le tunnel nym est il reellement connecte"
 # On regarde l etat du client, pas le health des conteneurs : logbook.md
 # signale que les conteneurs disaient healthy avec le tunnel tombe.
-doas docker exec nym nym-vpnc status --table-style blank 2>&1 | head -2
+doas docker exec tunnel-nymvpn nym-vpnc status --table-style blank 2>&1 | head -2
 
 say "D3. DNS actuel sur l hote, avant tout changement"
 # Point de reference pour comparer apres le deploiement.
