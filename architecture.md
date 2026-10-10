@@ -14,15 +14,18 @@
  │                                                              │
  │ ┌────────────────────────┐   ┌─────────────────────────────┐ │
  │ │ VOIE 1 : DIRECTE       │   │ VOIE 2 : ANONYMISÉE         │ │
- │ │ <OLD-SERVER-NAME> / tailscale       │   │ <OLD-NODE-EXIT-NYMVPN> / tailscaled       │ │
- │ │ réseau de l'hôte       │   │ nym / tunnel tun0           │ │
- │ │ <TAILNET-IP-EXIT-DIRECT>           │   │ <OLD-NETNS> / espace partagé │ │
- │ └────────────▲───────────┘   │ <TAILNET-IP-EXIT-NYMVPN>                │ │
+ │ │ <OLD-SERVER-NAME> / tailscale       │   │ <OLD-NETNS> (espace partagé) │ │
+ │ │ réseau de l'hôte       │   │                             │ │
+ │ │                        │   │  ┌──────┐ ┌────────────┐    │ │
+ │ └────────────▲───────────┘   │  │ nym  │ │ <OLD-NODE-EXIT-NYMVPN>   │    │ │
+ │              │               │  │ tun0 │ │ tailscale0 │    │ │
+ │              │               │  └──────┘ └────────────┘    │ │
+ │              │               │                             │ │
  │              │               └──────────────▲──────────────┘ │
  └──────────────┼──────────────────────────────┼────────────────┘
                 │                              │
                 └──────────────┬───────────────┘
-                               │ choix dans l'application
+                               │ choix dans l'application tailscale
                 ┌──────────────┴────────────────┐
                 │ TAILNET Bonnet2B1             │
                 │ iPhone <HOST-IPHONE>               │
