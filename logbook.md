@@ -477,3 +477,17 @@ Trois lecteurs sans historique ont relu les sept fichiers. Le lecteur des procé
 Le serveur a confirmé le mode espace utilisateur de la voie 1, avec l'option `--tun=userspace-networking` et aucune interface `tailscale0` sur l'hôte. Il a confirmé le refus du port 53 par les règles nft de Nym. Il a confirmé une MTU effective de 1340 octets sur la voie 2, mesurée sur du trafic réel. Il a fourni le digest complet de l'image de la voie 1, absent du journal avant ce jour.
 
 Les changements ont été enregistrés en sept commits le 2026-10-08, un par périmètre. La réorganisation de la documentation est terminée. La tâche correspondante a été retirée de [todo.md](todo.md).
+
+### Le renommage des vingt-quatre identifiants du 2026-10-10
+
+Le plan committé dans [todo.md](todo.md) (voie 2 puis voie 1) a été exécuté sans piège. Les trois couches — clé de service, `container_name`, hostname de nœud — ont été renommées sur le serveur puis dans le dépôt, deux commits, un par palier.
+
+La voie 2 est devenue `exit-nymvpn` : projet `/opt/exit-nymvpn`, services `netns-nymvpn`, `tunnel-nymvpn`, `exit-nymvpn`, `--hostname=exit-nymvpn`. Le nœud a gardé `<TAILNET-IP-EXIT-NYMVPN>`. La voie 1 est devenue `exit-direct` : projet `/opt/exit-direct`, conteneur `exit-direct`, `--hostname=exit-direct`. Le nœud a gardé `<TAILNET-IP-EXIT-DIRECT>` et l'ancien nœud `<OLD-SERVER-NAME>` n'existe plus.
+
+Le CLI Docker 29.5.3 ne propose pas `docker volume rename`. Les migrations ont été faites par `volume create` puis copie byte-identique (`cp -a` via alpine), contrôlée par `diff -r` et un hash SHA-256 agrégé identique. Les identités persistantes ont traversé la migration sans changement.
+
+Le client de diagnostic `ts-client` a été recréé sur le Mac avec une clé d'authentification éphémère fournie par l'utilisateur. Le nœud `ts-test` s'est enregistré en `<TAILNET-IP-TS-TEST>`. La boucle de relais a donné le contrôle `exit-direct` fonctionnel et un verdict `VERT` sur la cible `exit-nymvpn` : l'IP de sortie passe de `<WAN-IP-BOX-A>` (`<ISP-BOX>`) à `57.131.28.186` (passerelle Nym).
+
+Les volumes orphelins ont été supprimés par noms exacts après le vert final : `tailscale-nym_state`, `tailscale-nym_nym-data`, `tailscale-nym_ts-sock`, `tailscale_state`. Restent les volumes `exit-direct_state` et `exit-nymvpn_state`, `exit-nymvpn_nym-data`, `exit-nymvpn_ts-sock`.
+
+Restent des gestes côté clients à la reconnexion : démarrer Tailscale sur le Mac, vérifier l'SSH par le tailnet (`<TAILNET-IP-EXIT-DIRECT>`), reconnecter et re-sélectionner `exit-nymvpn` (et `exit-direct` en sortie directe) sur `<HOST-IPHONE>` et `<HOST-MACBOOK>`.

@@ -144,7 +144,7 @@ Un créneau permet de couper le tunnel. Le client de test est disponible sur le 
 #### Étapes
 
 - [ ] Arrêtez le tunnel Nym sur le serveur.
-- [ ] Demandez une page web au client avec `<OLD-NODE-EXIT-NYMVPN>` sélectionné.
+- [ ] Demandez une page web au client avec `exit-nymvpn` sélectionné.
 - [ ] Notez le résultat, l'erreur ou le délai obtenu.
 - [ ] Rétablissez le tunnel et vérifiez le relais.
 
@@ -230,10 +230,10 @@ Projets, dossiers et volumes :
   - [x] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state` *(CLI sans `volume rename` → `volume create` + `cp -a` + `diff -r` + sha256 identiques ; ancien volume conservé jusqu'au vert final)*, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
   - [ ] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; **SSH par Tailscale à vérifier au retour du client tailscale du Mac** (actuellement arrêté : `Tailscale is stopped`).
   - [x] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
-- [ ] Vérification finale :
-  - [ ] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn`), le tunnel est connecté, l'SSH fonctionne, adguard répond.
-  - [ ] Note datée dans logbook.md.
-- [ ] Nettoyage (après vert final) : suppression des volumes orphelins (`tailscale-nym_*`, `tailscale_state`).
+- [x] Vérification finale :
+  - [x] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn` : verdicts attendus du nœud direct et `VERT` anonymisé, IP `<WAN-IP-BOX-A>` → `57.131.28.186`), le tunnel est connecté, l'SSH LAN fonctionne. *(adguard : N/A, non déployé. SSH par tailnet : à vérifier au retour du client tailscale du Mac.)*
+  - [x] Note datée dans logbook.md.
+- [x] Nettoyage (après vert final) : suppression des volumes orphelins par noms exacts (`tailscale-nym_state`, `tailscale-nym_nym-data`, `tailscale-nym_ts-sock`, `tailscale_state`).
 
 #### Critères de réussite
 
@@ -290,7 +290,7 @@ brew uninstall colima docker lima
 
 #### Objectif
 
-Vérifier l'absence de résidu de règles nft sur le serveur. La documentation du diagnostic mentionnait deux règles marquées `TEMPO`. Elle indiquait leur disparition avec les recréations du conteneur `nym`.
+Vérifier l'absence de résidu de règles nft sur le serveur. La documentation du diagnostic mentionnait deux règles marquées `TEMPO`. Elle indiquait leur disparition avec les recréations du conteneur `tunnel-nymvpn`.
 
 #### Conditions
 
@@ -301,7 +301,7 @@ La sortie ne doit contenir aucune règle marquée `TEMPO`. Le contrôle se fait 
 - [ ] Sur le serveur, relevez la chaîne concernée :
 
 ```sh
-doas docker exec nym nft list chain inet nym forward
+doas docker exec tunnel-nymvpn nft list chain inet nym forward
 ```
 
 - [ ] Vérifiez l'absence de règle marquée `TEMPO` dans la sortie.
@@ -333,7 +333,7 @@ Le résolveur AdGuard dépend de l'arbitrage DNS en cours. Le mode d'accès du s
 - [ ] Définissez le mode d'accès du service avant toute installation.
 - [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
 - [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
-- [ ] Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
+- [ ] Définissez la sortie sur `exit-direct`, `exit-nymvpn` ou `none`.
 - [ ] Changez la sortie avec [maintenance.md](maintenance.md), section « La sortie d'un microservice ».
 - [ ] Suivez le gabarit de la phase C en annexe.
 - [ ] Vérifiez le fonctionnement du service après son déploiement.
@@ -356,14 +356,14 @@ Pour chaque service à ajouter, définissez d'abord le mode d'accès. Un contene
                        │
           ┌────────────┼────────────┐
           │            │            │
-        <OLD-SERVER-NAME>       <OLD-NODE-EXIT-NYMVPN>        none
+        exit-direct   exit-nymvpn   none
           │            │            │
     Sortie directe  Sortie Nym  Sans exit node
 ```
 
 Pour ajouter un service, appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ». Si le service nécessite une adresse Tailscale propre, ajoutez un conteneur compagnon. Si un choix de sortie indépendant est nécessaire, configurez ce compagnon pour ce choix.
 
-Définissez alors la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`. Pour vérifier la sortie et la changer en service, utilisez [maintenance.md](maintenance.md), section « La sortie d'un microservice ». Les critères de réussite dépendent du mode d'accès retenu.
+Définissez alors la sortie sur `exit-direct`, `exit-nymvpn` ou `none`. Pour vérifier la sortie et la changer en service, utilisez [maintenance.md](maintenance.md), section « La sortie d'un microservice ». Les critères de réussite dépendent du mode d'accès retenu.
 
 Le choix du résolveur AdGuard attend l'arbitrage de la section « Les étapes communes ». Le drapeau `--accept-routes=true` permet au compagnon de suivre la route de l'exit node. Le changement de sortie utilise `tailscale set` et conserve le conteneur.
 
@@ -382,7 +382,7 @@ L'ordinateur à réveiller reste allumé sur le réseau local ou admet le révei
 - [ ] Définissez le mode d'accès du service avant toute installation.
 - [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
 - [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
-- [ ] Définissez la sortie sur `<OLD-SERVER-NAME>`, `<OLD-NODE-EXIT-NYMVPN>` ou `none`.
+- [ ] Définissez la sortie sur `exit-direct`, `exit-nymvpn` ou `none`.
 - [ ] Suivez le gabarit de la phase C en annexe.
 - [ ] Réservez l'adresse IP du serveur sur le réseau local. La réservation ne sert qu'au jour du WoL.
 - [ ] Vérifiez le réveil d'un ordinateur après le déploiement.
@@ -426,12 +426,12 @@ Créer un dépôt GitHub privé pour les sources et la documentation. [readme.md
 
 #### Conditions
 
-Les sept fichiers sont validés. Le dépôt contiendra `tailscale/`, `tailscale-nym/`, `adguard/` et cette documentation.
+Les sept fichiers sont validés. Le dépôt contiendra `exit-direct/`, `exit-nymvpn/`, `adguard/` et cette documentation.
 
 #### Étapes
 
 - [ ] Créez le dépôt GitHub privé.
-- [ ] Ajoutez `tailscale/`, `tailscale-nym/`, `adguard/` et cette documentation.
+- [ ] Ajoutez `exit-direct/`, `exit-nymvpn/`, `adguard/` et cette documentation.
 - [ ] Vérifiez que les secrets restent hors du dépôt.
 - [ ] Vérifiez que les fichiers correspondent au périmètre validé.
 - [ ] Publiez [readme.md](readme.md) comme page d'accueil.
@@ -439,7 +439,7 @@ Les sept fichiers sont validés. Le dépôt contiendra `tailscale/`, `tailscale-
 #### Critères de réussite
 
 - [ ] Le dépôt est privé.
-- [ ] Le dépôt contient `tailscale/`, `tailscale-nym/`, `adguard/` et la documentation.
+- [ ] Le dépôt contient `exit-direct/`, `exit-nymvpn/`, `adguard/` et la documentation.
 - [ ] Aucun secret n'est présent dans le dépôt.
 - [ ] [readme.md](readme.md) est la page d'accueil.
 
@@ -533,9 +533,9 @@ Ce test suit toute reconfiguration réseau. Ici, la reconfiguration du 2026-10-0
 
 #### Critères de réussite
 
-- [ ] Les conteneurs `tailscale`, `<OLD-NETNS>`, `nym` et `<OLD-NODE-EXIT-NYMVPN>` sont `Up`.
-- [ ] `<OLD-SERVER-NAME>` garde `<TAILNET-IP-EXIT-DIRECT>`.
-- [ ] `<OLD-NODE-EXIT-NYMVPN>` garde `<TAILNET-IP-EXIT-NYMVPN>`.
+- [ ] Les conteneurs `exit-direct`, `netns-nymvpn`, `tunnel-nymvpn` et `exit-nymvpn` sont `Up`.
+- [ ] `exit-direct` garde `<TAILNET-IP-EXIT-DIRECT>`.
+- [ ] `exit-nymvpn` garde `<TAILNET-IP-EXIT-NYMVPN>`.
 - [ ] La route vers la passerelle utilise `eth0`.
 - [ ] Les deux sorties fonctionnent après le redémarrage.
 
@@ -631,11 +631,11 @@ Cette opération reste facultative. Aucune image utilisée ne doit être supprim
 - [ ] Les images des services restent disponibles.
 - [ ] Les services redémarrent sans erreur d'image.
 
-### La réinscription du nœud `<OLD-SERVER-NAME>`
+### La réinscription du nœud exit-direct
 
 #### Objectif
 
-Rétablir l'identité du nœud `<OLD-SERVER-NAME>` quand aucune clé d'authentification ne reste. [logbook.md](logbook.md) consigne ce cas le 2026-10-01.
+Rétablir l'identité du nœud `exit-direct` quand aucune clé d'authentification ne reste. [logbook.md](logbook.md) consigne ce cas le 2026-10-01.
 
 #### Conditions
 
@@ -650,6 +650,6 @@ L'utilisateur fournit une clé d'authentification. Son accord précède toute é
 
 #### Critères de réussite
 
-- [ ] Le nœud `<OLD-SERVER-NAME>` est de nouveau approuvé comme exit node.
+- [ ] Le nœud `exit-direct` est de nouveau approuvé comme exit node.
 - [ ] La clé ne figure dans aucun fichier suivi par Git.
 - [ ] Le résultat est consigné dans [logbook.md](logbook.md).
