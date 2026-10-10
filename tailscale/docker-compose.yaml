@@ -1,5 +1,6 @@
 services:
   tailscale:
+    # Epinglee par digest, version v1.102.5 relevee le 2026-10-08.
     image: tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065
     container_name: tailscale
     network_mode: host
