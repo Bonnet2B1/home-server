@@ -284,6 +284,16 @@ L'utilisateur a validé la nouvelle rédaction de [guidelines.md](guidelines.md)
 
 Le glossaire a été simplifié pour définir les concepts sans reprendre la configuration du serveur. Les règles documentaires ont intégré la pertinence, le minimalisme, la précision et la relecture sans contexte. La tâche d'ajout de ces règles a été retirée de [todo.md](todo.md).
 
+## Les sources de la voie 1 versées au dépôt, 2026-10-10
+
+Les sources de `/opt/tailscale` sont désormais versionnées. Le répertoire `tailscale/` du dépôt contient le compose, son gabarit et son `.gitignore`.
+
+Le compose est copié tel quel depuis le serveur. L'image reste épinglée par son digest complet : `tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065`. Le compose ne référence plus aucune variable `TS_AUTHKEY` depuis le 2026-10-03.
+
+Le fichier `/opt/tailscale/.env` est vide et en mode `600`. Il ne rejoint jamais le dépôt. Le gabarit [.env.example](tailscale/.env.example) documente qu'aucun secret n'est requis. Un [.gitignore](tailscale/.gitignore) exclut le `.env`.
+
+L'identité du nœud vit dans le volume `state`. Le compose ne pose que `TS_STATE_DIR` et `TS_EXTRA_ARGS=--advertise-exit-node`. Le projet est donc reconstructible depuis le dépôt.
+
 ## Les compléments issus de l'architecture
 
 La date d'origine de ces faits n'est pas consignée. Leur position dans cette chronologie n'est donc pas connue.

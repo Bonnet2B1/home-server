@@ -86,7 +86,7 @@ Le tailnet Bonnet2B1 contient deux exit nodes, `<OLD-SERVER-NAME>` et `<OLD-NODE
 
 Le conteneur `tailscale` porte le nœud `<OLD-SERVER-NAME>`, en `<TAILNET-IP-EXIT-DIRECT>`. Il utilise le réseau de l'hôte et sort par la `<ISP-BOX>`. L'adresse publique de cette sortie est dynamique.
 
-Le projet compose vit dans `/opt/tailscale` et utilise l'image officielle Tailscale. Le conteneur dispose des capacités `NET_ADMIN` et `NET_RAW`, ainsi que de `/dev/net/tun`. `tailscaled` démarre avec l'option `--tun=userspace-networking`. Le nœud tourne en mode espace utilisateur et n'installe aucune règle de pare-feu sur l'hôte. Le serveur ne porte aucune interface `tailscale0`. Le conteneur ne voit pas le tunnel de la voie anonymisée.
+Le projet compose vit dans `/opt/tailscale` et utilise l'image officielle Tailscale. Ses sources sont versées dans [docker-compose.yaml](tailscale/docker-compose.yaml). Le conteneur dispose des capacités `NET_ADMIN` et `NET_RAW`, ainsi que de `/dev/net/tun`. `tailscaled` démarre avec l'option `--tun=userspace-networking`. Le nœud tourne en mode espace utilisateur et n'installe aucune règle de pare-feu sur l'hôte. Le serveur ne porte aucune interface `tailscale0`. Le conteneur ne voit pas le tunnel de la voie anonymisée.
 
 L'état du nœud vit dans le volume `state`, au chemin `/var/lib/tailscale`. Ce volume conserve son identité entre les redémarrages et les recréations. `<OLD-SERVER-NAME>` est approuvé comme exit node dans la console Tailscale.
 

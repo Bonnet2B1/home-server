@@ -336,29 +336,6 @@ doas docker exec nym nft list chain inet nym forward
 - [ ] Chaque règle subsistante a un rôle identifié.
 - [ ] Le pare-feu n'est modifié qu'après approbation.
 
-### Les sources de la voie 1 dans le dépôt
-
-#### Objectif
-
-Verser les sources de `/opt/tailscale` dans le dépôt. [guidelines.md](guidelines.md) les exige pour tout projet Compose. Seul le digest est consigné aujourd'hui.
-
-#### Conditions
-
-Le fichier `.env` ne rejoint jamais le dépôt. Seules les valeurs de configuration sans secret sont versées.
-
-#### Étapes
-
-- [ ] Copiez le compose et le `.env.example` dans un répertoire du dépôt.
-- [ ] Consignez le digest complet de l'image.
-- [ ] Ajoutez un `.gitignore` qui exclut le `.env`.
-- [ ] Vérifiez que le dépôt ne contient aucun secret.
-
-#### Critères de réussite
-
-- [ ] Le projet de la voie 1 est reconstructible depuis le dépôt.
-- [ ] Le digest de l'image est complet et épinglé.
-- [ ] Aucun secret ne figure dans le dépôt.
-
 ## Les phases restantes
 
 Quatre phases restent ouvertes. [readme.md](readme.md) donne leur état global. Chaque phase a sa tâche ici.
@@ -471,12 +448,12 @@ Créer un dépôt GitHub privé pour les sources et la documentation. [readme.md
 
 #### Conditions
 
-Les sept fichiers sont validés. Le dépôt contiendra `tailscale-nym/`, `adguard/` et cette documentation.
+Les sept fichiers sont validés. Le dépôt contiendra `tailscale/`, `tailscale-nym/`, `adguard/` et cette documentation.
 
 #### Étapes
 
 - [ ] Créez le dépôt GitHub privé.
-- [ ] Ajoutez `tailscale-nym/`, `adguard/` et cette documentation.
+- [ ] Ajoutez `tailscale/`, `tailscale-nym/`, `adguard/` et cette documentation.
 - [ ] Vérifiez que les secrets restent hors du dépôt.
 - [ ] Vérifiez que les fichiers correspondent au périmètre validé.
 - [ ] Publiez [readme.md](readme.md) comme page d'accueil.
@@ -484,7 +461,7 @@ Les sept fichiers sont validés. Le dépôt contiendra `tailscale-nym/`, `adguar
 #### Critères de réussite
 
 - [ ] Le dépôt est privé.
-- [ ] Le dépôt contient `tailscale-nym/`, `adguard/` et la documentation.
+- [ ] Le dépôt contient `tailscale/`, `tailscale-nym/`, `adguard/` et la documentation.
 - [ ] Aucun secret n'est présent dans le dépôt.
 - [ ] [readme.md](readme.md) est la page d'accueil.
 
