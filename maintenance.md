@@ -12,7 +12,7 @@ Depuis un appareil connecté au tailnet, ouvrez la session SSH :
 ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>
 ```
 
-Le résultat attendu est une session sur `<OLD-SERVER-NAME>`, avec le compte `<ADMIN-ACCOUNT>`. Les commandes Docker du serveur utilisent `doas`. Cette connexion ne dépend pas du tunnel Nym. Elle exige que le poste client ait sélectionné `<OLD-SERVER-NAME>`.
+Le résultat attendu est une session sur `<OLD-SERVER-NAME>`, avec le compte `<ADMIN-ACCOUNT>`. Les commandes Docker du serveur utilisent `doas`. Cette connexion ne dépend pas du tunnel Nym. Elle exige que le poste client ait sélectionné `exit-direct`.
 
 ## Le diagnostic de la voie directe
 
@@ -30,7 +30,7 @@ Le conteneur attendu est `tailscale`, à l'état `running`. Un état arrêté ou
 Vérifiez que l'identité du nœud est persistée :
 
 ```sh
-doas docker exec tailscale ls -l /var/lib/tailscale/tailscaled.state
+doas docker exec exit-direct ls -l /var/lib/tailscale/tailscaled.state
 ```
 
 Le fichier `tailscaled.state` doit exister dans le conteneur. Son absence indique une identité en mémoire, perdue à chaque recréation.
@@ -74,7 +74,7 @@ Le tunnel doit afficher `Connected`. Le nœud doit apparaître dans le tailnet s
 
 Cette vérification compare la sortie directe et la sortie Nym depuis l'iPhone. L'adresse publique de la `<ISP-BOX>` peut changer. Le témoin direct se mesure pendant la même vérification.
 
-Depuis l'iPhone, sélectionnez `<OLD-SERVER-NAME>` dans l'application Tailscale. Ouvrez `https://api.ipify.org`. Notez l'adresse affichée comme témoin direct.
+Depuis l'iPhone, sélectionnez `exit-direct` dans l'application Tailscale. Ouvrez `https://api.ipify.org`. Notez l'adresse affichée comme témoin direct.
 
 Sélectionnez ensuite `exit-nymvpn`. Ouvrez la même adresse. Vérifiez que l'adresse affichée diffère du témoin direct.
 
@@ -176,7 +176,7 @@ Lancez ensuite la boucle de relais :
 bash exit-nymvpn/loop.sh
 ```
 
-La boucle contrôle d'abord `<OLD-SERVER-NAME>`, puis la cible `exit-nymvpn`. Deux verdicts `VERT` indiquent un relais correct. Un verdict `ROUGE` sur la cible signale un défaut du relais.
+La boucle contrôle d'abord `exit-direct`, puis la cible `exit-nymvpn`. Deux verdicts `VERT` indiquent un relais correct. Un verdict `ROUGE` sur la cible signale un défaut du relais.
 
 ## La sortie d'un microservice
 
@@ -197,7 +197,7 @@ doas docker exec "$SERVICE_TAILSCALE" tailscale set --exit-node=exit-nymvpn
 Pour la sortie directe, lancez cette commande :
 
 ```sh
-doas docker exec "$SERVICE_TAILSCALE" tailscale set --exit-node=<OLD-SERVER-NAME>
+doas docker exec "$SERVICE_TAILSCALE" tailscale set --exit-node=exit-direct
 ```
 
 Pour retirer le choix d'un exit node, lancez cette commande :
@@ -222,7 +222,7 @@ Après un redémarrage, reconnectez-vous au serveur. Vérifiez les conteneurs, l
 
 ```sh
 doas docker ps -a --format '{{.Names}} {{.Status}}'
-doas docker exec tailscale tailscale ip -4
+doas docker exec exit-direct tailscale ip -4
 doas docker exec exit-nymvpn tailscale ip -4
 doas docker logs tunnel-nymvpn 2>&1 | grep -F '[superviseur]'
 doas rc-status default | grep uplink-guard
@@ -231,7 +231,7 @@ ip -4 addr show dev wlan0
 ip -4 route get <LAN-GATEWAY-IP>
 ```
 
-Les conteneurs `tailscale`, `netns-nymvpn`, `tunnel-nymvpn` et `exit-nymvpn` doivent être `Up`. `<OLD-SERVER-NAME>` doit garder `<TAILNET-IP-EXIT-DIRECT>`. `exit-nymvpn` doit garder `<TAILNET-IP-EXIT-NYMVPN>`. Le superviseur doit journaliser la reconnexion. Le gardien `uplink-guard` doit Started dans le runlevel `default`. `eth0` doit porter `<LAN-IP-SERVER>`. `wlan0` doit garder `<LAN-IP-WIFI>`. La route vers `<LAN-GATEWAY-IP>` doit utiliser `eth0`. La section « La vérification des sorties » vérifie ensuite le relais.
+Les conteneurs `exit-direct`, `netns-nymvpn`, `tunnel-nymvpn` et `exit-nymvpn` doivent être `Up`. `exit-direct` doit garder `<TAILNET-IP-EXIT-DIRECT>`. `exit-nymvpn` doit garder `<TAILNET-IP-EXIT-NYMVPN>`. Le superviseur doit journaliser la reconnexion. Le gardien `uplink-guard` doit Started dans le runlevel `default`. `eth0` doit porter `<LAN-IP-SERVER>`. `wlan0` doit garder `<LAN-IP-WIFI>`. La route vers `<LAN-GATEWAY-IP>` doit utiliser `eth0`. La section « La vérification des sorties » vérifie ensuite le relais.
 
 ## La mise à jour du système
 
@@ -256,12 +256,12 @@ Si le noyau a changé, convenez du redémarrage avec l'utilisateur. Vérifiez en
 
 ## La mise à jour de la voie directe
 
-Le projet de la voie directe est `/opt/tailscale`. Son identité persistante vit dans le volume `state`. Cette intervention demande l'accord de l'utilisateur.
+Le projet de la voie directe est `/opt/exit-direct`. Son identité persistante vit dans le volume `state`. Cette intervention demande l'accord de l'utilisateur.
 
 Après accord, mettez à jour le digest de l'image dans le compose. Sur le serveur, lancez la mise à jour :
 
 ```sh
-cd /opt/tailscale
+cd /opt/exit-direct
 doas docker compose pull
 doas docker compose up -d --force-recreate
 ```
@@ -269,7 +269,7 @@ doas docker compose up -d --force-recreate
 Vérifiez le retour de la connexion SSH et l'adresse du nœud :
 
 ```sh
-doas docker exec tailscale tailscale ip -4
+doas docker exec exit-direct tailscale ip -4
 ```
 
 Le nœud doit garder `<TAILNET-IP-EXIT-DIRECT>`. Le conteneur doit reprendre sans perdre son identité. La section « La vérification des sorties » vérifie le résultat depuis un client.

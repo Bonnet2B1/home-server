@@ -11,7 +11,7 @@ name: adguard
 # defaut 0.0.0.0/0 de l exit node. Une requete DNS vers l IP tailnet d AdGuard
 # part donc par le tailnet, vers ce service, quel que soit l exit node choisi.
 # Aucune regle n est ecrite dans l espace reseau de exit-nymvpn, ni dans le netns
-# host de <OLD-SERVER-NAME>.
+# host de exit-direct.
 
 services:
   # tailscaled en conteneur compagnon. Il donne au service une IP tailnet stable

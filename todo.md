@@ -223,13 +223,13 @@ Projets, dossiers et volumes :
   - [x] Déplacement du dossier : `/opt/tailscale-nym` → `/opt/exit-nymvpn`.
   - [x] Mise à jour de `docker-compose.yaml` : `name: exit-nymvpn` ; services `netns` → `netns-nymvpn` (conteneur et `hostname`), `nym` → `tunnel-nymvpn`, `tailscale` → `exit-nymvpn` ; références `network_mode: "service:netns-nymvpn"` et `depends_on` suivent ; `--hostname=exit-nymvpn`.
   - [x] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
-  - [ ] Porte A : côté serveur ✓ (`docker ps` aux noms exacts, IP `<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`, `nym-vpnc` Connected, exit node approuvé, grep des anciens identifiants → 0 hit) ; **côté clients en attente** : clé d'auth Tailscale fraîche pour loop.sh sur la cible `exit-nymvpn` + re-sélection de l'exit node dans l'app.
+  - [x] Porte A : côté serveur ✓ (`docker ps` aux noms exacts, IP `<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`, `nym-vpnc` Connected, exit node approuvé, grep des anciens identifiants → 0 hit) ; côté clients ✓ relais vérifié par loop.sh sur la cible `exit-nymvpn` (VERDICT VERT, IP `<WAN-IP-BOX-A>` → 57.131.28.186) ; reste au moment où `<HOST-IPHONE>`/`<HOST-MACBOOK>` se reconnectent : re-sélection de `exit-nymvpn` dans l'app.
   - [x] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
 - [ ] Palier B — voie 1 :
-  - [ ] Revérifier l'SSH par le LAN.
-  - [ ] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state`, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
-  - [ ] Porte B : `docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée ; SSH fonctionne par Tailscale et par le LAN ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant.
-  - [ ] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
+  - [x] Revérifier l'SSH par le LAN.
+  - [x] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state` *(CLI sans `volume rename` → `volume create` + `cp -a` + `diff -r` + sha256 identiques ; ancien volume conservé jusqu'au vert final)*, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
+  - [ ] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; **SSH par Tailscale à vérifier au retour du client tailscale du Mac** (actuellement arrêté : `Tailscale is stopped`).
+  - [x] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
 - [ ] Vérification finale :
   - [ ] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn`), le tunnel est connecté, l'SSH fonctionne, adguard répond.
   - [ ] Note datée dans logbook.md.

@@ -4,7 +4,7 @@
 # Signal : l IP de sortie du client change-t-elle quand on selectionne
 # l exit node, et le client atteint-t-il Internet ?
 #
-# CONTROLE : on teste d'abord <OLD-SERVER-NAME>, l exit node qui marche deja. Si le
+# CONTROLE : on teste d'abord exit-direct, l exit node qui marche deja. Si le
 # controle echoue, ce n est pas le serveur le fautif, c est la boucle.
 # Sans ce controle, tout echec est attribuable au mauvais composant.
 #
@@ -113,8 +113,8 @@ run_case() {
 
 ensure_client
 
-echo "=== controle : <OLD-SERVER-NAME>, exit node connu comme fonctionnel ==="
-run_case <OLD-SERVER-NAME>
+echo "=== controle : exit-direct, exit node connu comme fonctionnel ==="
+run_case exit-direct
 echo
 echo "=== cible : exit-nymvpn ==="
 run_case exit-nymvpn

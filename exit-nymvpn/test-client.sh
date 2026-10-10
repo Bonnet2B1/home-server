@@ -1,7 +1,7 @@
 #!/bin/sh
 # Conteneur Tailscale servant de client de test pour exit-nymvpn.
 # Il ne touche pas au Mac hote : seul le conteneur choisit l exit node.
-# Le Mac reste sur <OLD-SERVER-NAME>, donc la session de travail n est pas coupee.
+# Le Mac reste sur exit-direct, donc la session de travail n est pas coupee.
 #
 # NET_ADMIN   : creer et configurer les interfaces reseau.
 # /dev/net/tun : la porte vers le noyau, pour creer tailscale0.

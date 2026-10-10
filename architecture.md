@@ -14,7 +14,7 @@
  │                                                              │
  │ ┌────────────────────────┐   ┌─────────────────────────────┐ │
  │ │ VOIE 1 : DIRECTE       │   │ VOIE 2 : ANONYMISÉE         │ │
- │ │ <OLD-SERVER-NAME> / tailscale       │   │netns-nymvpn (espace partagé)│ │
+ │ │ exit-direct / tailscale│   │netns-nymvpn (espace partagé)│ │
  │ │ réseau de l'hôte       │   │                             │ │
  │ │                        │   │  ┌──────────────┐           │ │
  │ └────────────▲───────────┘   │  │tunnel-nymvpn │           │ │
@@ -60,7 +60,7 @@ Le serveur est le laptop `<SERVER-MODEL>`, dont le nom d'hôte est `<OLD-SERVER-
 
 ### Les conteneurs : Docker
 
-Docker 29.5.x héberge les services, regroupés en projets Compose v5.1.4. Le projet `/opt/tailscale` porte la voie directe. Le projet `/opt/exit-nymvpn` porte la voie anonymisée.
+Docker 29.5.x héberge les services, regroupés en projets Compose v5.1.4. Le projet `/opt/exit-direct` porte la voie directe. Le projet `/opt/exit-nymvpn` porte la voie anonymisée.
 
 Docker démarre avec le système. Les conteneurs portent une politique de redémarrage automatique. Les volumes conservent les identités Tailscale et les données Nym entre les recréations.
 
@@ -84,15 +84,15 @@ L'authentification utilise une clé seule. `PasswordAuthentication` vaut `no`. L
 
 ## Niveau 2 : les sorties Internet
 
-Le tailnet Bonnet2B1 contient deux exit nodes, `<OLD-SERVER-NAME>` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
+Le tailnet Bonnet2B1 contient deux exit nodes, `exit-direct` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
 
-### La sortie directe : tailscale / `<OLD-SERVER-NAME>`
+### La sortie directe : exit-direct
 
-Le conteneur `tailscale` porte le nœud `<OLD-SERVER-NAME>`, en `<TAILNET-IP-EXIT-DIRECT>`. Il utilise le réseau de l'hôte et sort par la `<ISP-BOX>`. L'adresse publique de cette sortie est dynamique.
+Le conteneur `exit-direct` porte le nœud `exit-direct`, en `<TAILNET-IP-EXIT-DIRECT>`. Il utilise le réseau de l'hôte et sort par la `<ISP-BOX>`. L'adresse publique de cette sortie est dynamique.
 
-Le projet compose vit dans `/opt/tailscale` et utilise l'image officielle Tailscale. Ses sources sont versées dans [docker-compose.yaml](tailscale/docker-compose.yaml). Le conteneur dispose des capacités `NET_ADMIN` et `NET_RAW`, ainsi que de `/dev/net/tun`. `tailscaled` démarre avec l'option `--tun=userspace-networking`. Le nœud tourne en mode espace utilisateur et n'installe aucune règle de pare-feu sur l'hôte. Le serveur ne porte aucune interface `tailscale0`. Le conteneur ne voit pas le tunnel de la voie anonymisée.
+Le projet compose vit dans `/opt/exit-direct` et utilise l'image officielle Tailscale. Ses sources sont versées dans [docker-compose.yaml](exit-direct/docker-compose.yaml). Le conteneur dispose des capacités `NET_ADMIN` et `NET_RAW`, ainsi que de `/dev/net/tun`. `tailscaled` démarre avec l'option `--tun=userspace-networking`. Le nœud tourne en mode espace utilisateur et n'installe aucune règle de pare-feu sur l'hôte. Le serveur ne porte aucune interface `tailscale0`. Le conteneur ne voit pas le tunnel de la voie anonymisée.
 
-L'état du nœud vit dans le volume `state`, au chemin `/var/lib/tailscale`. Ce volume conserve son identité entre les redémarrages et les recréations. `<OLD-SERVER-NAME>` est approuvé comme exit node dans la console Tailscale.
+L'état du nœud vit dans le volume `state`, au chemin `/var/lib/tailscale`. Ce volume conserve son identité entre les redémarrages et les recréations. `exit-direct` est approuvé comme exit node dans la console Tailscale.
 
 ### L'espace réseau de la voie anonymisée : netns-nymvpn
 

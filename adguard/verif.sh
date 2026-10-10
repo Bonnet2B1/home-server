@@ -123,7 +123,7 @@ fi
 # ------------------------------------------------------------ D. ETAT
 
 say "D1. Les deux noeuds de sortie sont ils en ligne"
-doas docker exec tailscale tailscale status 2>&1 | head -3
+doas docker exec exit-direct tailscale status 2>&1 | head -3
 doas docker exec exit-nymvpn tailscale status 2>&1 | head -3
 
 say "D2. Le tunnel nym est il reellement connecte"

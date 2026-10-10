@@ -1,8 +1,9 @@
+name: exit-direct
 services:
-  tailscale:
+  exit-direct:
     # Epinglee par digest, version v1.102.5 relevee le 2026-10-08.
     image: tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065
-    container_name: tailscale
+    container_name: exit-direct
     network_mode: host
     cap_add:
       - NET_ADMIN
@@ -13,7 +14,7 @@ services:
       - state:/var/lib/tailscale
     environment:
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_EXTRA_ARGS=--advertise-exit-node
+      - TS_EXTRA_ARGS=--advertise-exit-node --hostname=exit-direct
     restart: unless-stopped
 
 volumes:
