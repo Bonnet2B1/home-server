@@ -28,4 +28,4 @@ Cet aperçu regroupe les fonctions du serveur. Les étapes et les critères dét
 - [ ] [WoL](todo.md#le-microservice-wol) : réveil d'un ordinateur à distance.
 - [ ] [ntfy](todo.md#la-surveillance-et-les-notifications-avec-ntfy) : alertes de coupure de l'anonymiseur ou de courant.
 - [ ] [Nym mixnet](todo.md#le-conteneur-nym-pour-le-mixnet) : conteneur dédié au mixnet.
-- [x] [GitHub](todo.md#le-masquage-avant-publication) : dépôt public pour les sources et la documentation.
+- [x] GitHub : dépôt public pour les sources et la documentation.

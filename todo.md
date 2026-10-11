@@ -418,38 +418,6 @@ Le serveur peut être indisponible pendant une coupure de courant. L'émission d
 - [ ] Chaque situation déclenche une alerte.
 - [ ] L'émission reste possible quand le serveur est indisponible.
 
-### Le masquage avant publication
-
-#### Objectif
-
-Publier les sources et la documentation dans un dépôt GitHub public, sans exposer les valeurs qui identifient l'utilisateur ou son réseau. [readme.md](readme.md) en est la page d'accueil.
-
-#### Conditions
-
-Les sept fichiers sont validés. Le dépôt contient `exit-direct/`, `exit-nymvpn/`, `adguard/` et cette documentation. Les règles de masquage sont dans [guidelines.md](guidelines.md), section « Le masquage avant publication ».
-
-#### Étapes
-
-- [x] Créez le dépôt GitHub.
-- [x] Écrivez les valeurs réelles dans l'arbre de travail, et remplacez-les par des jetons au commit.
-- [x] Activez le filtre `redact` et le hook `pre-commit` avec `tools/install-filters.sh`.
-- [x] Réécrivez l'historique : contenu, auteur et message des vingt-quatre commits d'origine.
-- [x] Purgez les refs internes et le reflog, puis contrôlez un clone neuf du dépôt public.
-- [x] Ajoutez `exit-direct/`, `exit-nymvpn/`, `adguard/` et cette documentation.
-- [x] Vérifiez que les secrets restent hors du dépôt.
-- [x] Publiez [readme.md](readme.md) comme page d'accueil.
-- [x] Poussez `main` seule, sans `--mirror`.
-
-#### Critères de réussite
-
-- [x] Le dépôt est public : <https://github.com/Bonnet2B1/home-server>.
-- [x] Le dépôt contient `exit-direct/`, `exit-nymvpn/`, `adguard/` et la documentation.
-- [x] Aucun secret n'est présent dans le dépôt.
-- [x] Aucune valeur identifiante ne figure dans les arbres ni dans les messages des commits.
-- [x] Un clone neuf du dépôt public ne révèle aucune valeur masquée.
-- [x] L'arbre de travail local conserve les valeurs réelles.
-- [x] [readme.md](readme.md) est la page d'accueil.
-
 ## Les défauts connus, non corrigés
 
 Cette section liste les défauts connus qui restent ouverts. Chaque défaut devient une tâche avec ses étapes et ses critères. Les constats sont conservés tels quels.
