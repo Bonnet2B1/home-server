@@ -93,8 +93,10 @@ def main():
         args = ["commit-tree", new_tree]
         for p in parents:
             args += ["-p", mapping[p]]
+        # GitHub rend le message en Markdown : meme regle que la prose.
+        new_message = wrap_tokens(redact_text(message, "clean"))
         res = subprocess.run(["git", *args], cwd=ROOT, check=True, env=cenv,
-                             input=redact_text(message, "clean").encode(),
+                             input=new_message.encode(),
                              capture_output=True)
         new_sha = res.stdout.decode().strip()
         mapping[old] = new_sha

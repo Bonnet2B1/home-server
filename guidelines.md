@@ -72,6 +72,7 @@ Le tableau donne la légende des jetons.
 | `<WAN-IP-BOX-A>`, `<WAN-IP-BOX-B>` | Adresses publiques de la box, relevées à deux dates. |
 | `<ISP>`, `<ISP-BOX>` | Fournisseur d'accès Internet et sa box. |
 | `<TAILNET-NAME>` | Nom du tailnet. |
+| `<TAILNET-DOMAIN>` | Domaine du tailnet. |
 | `<TAILNET-IP-EXIT-DIRECT>` | Adresse Tailscale du nœud de sortie directe. |
 | `<TAILNET-IP-EXIT-NYMVPN>` | Adresse Tailscale du nœud de sortie Nym. |
 | `<TAILNET-IP-CLIENT>` | Adresse Tailscale du client MacBook. |
@@ -92,6 +93,7 @@ Le tableau donne la légende des jetons.
 | `<OLD-NODE-EXIT-NYMVPN>` | Ancien nom du conteneur de sortie Nym. |
 | `<OLD-NETNS>` | Ancien nom de l'espace réseau. |
 | `<ADMIN-ACCOUNT>` | Nom du compte d'administration SSH. |
+| `/Users/<LOCAL-USER>` | Répertoire du dépôt sur le poste local. |
 
 ### Le réseau
 
