@@ -290,7 +290,7 @@ Les sources de `/opt/tailscale` sont désormais versionnées. Le répertoire `ta
 
 Le compose est copié tel quel depuis le serveur. L'image reste épinglée par son digest complet : `tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065`. Le compose ne référence plus aucune variable `TS_AUTHKEY` depuis le 2026-10-03.
 
-Le fichier `/opt/tailscale/.env` est vide et en mode `600`. Il ne rejoint jamais le dépôt. Le gabarit [.env.example](tailscale/.env.example) documente qu'aucun secret n'est requis. Un [.gitignore](tailscale/.gitignore) exclut le `.env`.
+Le fichier `/opt/exit-direct/.env` est vide et en mode `600`. Il ne rejoint jamais le dépôt. Le gabarit [.env.example](exit-direct/.env.example) documente qu'aucun secret n'est requis. Un [.gitignore](exit-direct/.gitignore) exclut le `.env`.
 
 L'identité du nœud vit dans le volume `state`. Le compose ne pose que `TS_STATE_DIR` et `TS_EXTRA_ARGS=--advertise-exit-node`. Le projet est donc reconstructible depuis le dépôt.
 

@@ -16,16 +16,16 @@ Le résultat attendu est une session sur `<OLD-SERVER-NAME>`, avec le compte `<A
 
 ## Le diagnostic de la voie directe
 
-Ces contrôles nécessitent un accès au serveur, par le réseau local ou sur place. Ils vérifient le conteneur Tailscale et la connectivité de l'hôte. La décision sur une modification du DNS reste dans [todo.md](todo.md), section « Le DNS de l'hôte lors d'une récupération ».
+Ces contrôles nécessitent un accès au serveur, par le réseau local ou sur place. Ils vérifient le conteneur `exit-direct` et la connectivité de l'hôte. La décision sur une modification du DNS reste dans [todo.md](todo.md), section « Le DNS de l'hôte lors d'une récupération ».
 
 Sur le serveur, relevez l'état du conteneur :
 
 ```sh
 doas docker ps -a --format '{{.Names}} {{.Status}}'
-doas docker inspect -f '{{.State.Status}} {{.State.ExitCode}}' tailscale
+doas docker inspect -f '{{.State.Status}} {{.State.ExitCode}}' exit-direct
 ```
 
-Le conteneur attendu est `tailscale`, à l'état `running`. Un état arrêté ou des redémarrages répétés indiquent un échec de démarrage. Le code de sortie complète ce constat.
+Le conteneur attendu est `exit-direct`, à l'état `running`. Un état arrêté ou des redémarrages répétés indiquent un échec de démarrage. Le code de sortie complète ce constat.
 
 Vérifiez que l'identité du nœud est persistée :
 
@@ -38,7 +38,7 @@ Le fichier `tailscaled.state` doit exister dans le conteneur. Son absence indiqu
 Relevez uniquement les motifs d'erreur suivants dans le journal :
 
 ```sh
-doas docker logs --tail 80 tailscale 2>&1 | grep -oE 'NeedsLogin|network is unreachable|no such host|panic'
+doas docker logs --tail 80 exit-direct 2>&1 | grep -oE 'NeedsLogin|network is unreachable|no such host|panic'
 ```
 
 `NeedsLogin` indique un besoin d'enregistrement. Les deux erreurs réseau concernent la connectivité ou la résolution de noms. `panic` indique un arrêt anormal. Une sortie vide signifie seulement que ces motifs sont absents des lignes examinées.

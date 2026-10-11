@@ -225,7 +225,7 @@ Projets, dossiers et volumes :
   - [x] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
   - [x] Porte A : côté serveur ✓ (`docker ps` aux noms exacts, IP `<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`, `nym-vpnc` Connected, exit node approuvé, grep des anciens identifiants → 0 hit) ; côté clients ✓ relais vérifié par loop.sh sur la cible `exit-nymvpn` (VERDICT VERT, IP `<WAN-IP-BOX-A>` → 57.131.28.186) ; reste au moment où `<HOST-IPHONE>`/`<HOST-MACBOOK>` se reconnectent : re-sélection de `exit-nymvpn` dans l'app.
   - [x] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
-- [ ] Palier B — voie 1 :
+- [x] Palier B — voie 1 :
   - [x] Revérifier l'SSH par le LAN.
   - [x] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state` *(CLI sans `volume rename` → `volume create` + `cp -a` + `diff -r` + sha256 identiques ; ancien volume conservé jusqu'au vert final)*, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
   - [x] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; SSH par Tailscale ✓ de bout en bout depuis le Mac : `ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>` répond (`<OLD-SERVER-NAME>`), validé après retour de `<HOST-MACBOOK>` sur le tailnet (sortie directe `exit-direct` sélectionnée, `ExitNodeAllowLANAccess` actif).
