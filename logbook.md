@@ -551,3 +551,13 @@ Quatre audits indépendants ont passé en revue le dépôt publié, le masquage 
 Un contrôle vient s'ajouter au hook `pre-commit` : un hook `commit-msg` refuse un message de commit qui contient une valeur réelle ou un jeton écrit en prose sans backticks. `check_leaks.py` ne plante plus sur une adresse invalide, et les fichiers binaires ne lui échappent plus : il y cherche les valeurs à fort signal. La détection des adresses MAC accepte les tirets, pas seulement les deux-points. Le filtre et le hook partagent la même règle de frontière : une valeur collée à un autre caractère est masquée, donc le commit n'est plus bloqué sans issue. Les jetons dans un lien Markdown ou dans une URL ne sont ni backtiqués ni signalés. `rewrite_history.py` gère les fusions et refuse d'écraser la branche `sanitize` sans `REWRITE_FORCE=1`. La couverture du filtre s'étend aux `*.py`, à `.gitignore`, à `.dockerignore`, à `LICENSE` et aux hooks.
 
 La section « Les défauts connus, non corrigés » de [todo.md](todo.md) est retirée : un défaut connu devient un travail fait immédiatement, pas une catégorie d'attente. Le chiffre « vingt-quatre commits d'origine » est corrigé en « vingt-huit », le compte relevé dans la sauvegarde.
+
+## La surveillance de l'adresse publique, 2026-10-11
+
+L'adresse publique de la box peut changer sans prévenir. La table `sanitize.map` ne connaît que les valeurs écrites. Une adresse nouvelle échappe au filtre et au hook. Un contrôle automatisé comble ce trou.
+
+`tools/wan_ip.py` a deux modes. `check` lit l'adresse publique actuelle et vérifie qu'elle est couverte par la table. Il bloque un commit dont l'index contient cette adresse en clair. Sans réseau, il prévient et ne bloque pas. `update` remplace la valeur réelle du jeton de la box A dans `sanitize.map`.
+
+Le hook `pre-commit` exécute le contrôle après `check_leaks.py`. La section « Les règles Git et de push » de [guidelines.md](guidelines.md) rassemble les règles de poussée liées à la confidentialité.
+
+Le contrôle a été vérifié sur dix scénarios, dont le blocage bout en bout d'un commit qui contenait l'adresse courante en clair. Le contrôle en conditions réelles du jour : l'adresse publique actuelle est couverte par la table.

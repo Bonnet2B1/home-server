@@ -62,8 +62,7 @@ Le dépôt est publié sur GitHub. Avant publication, masquez toute valeur qui i
 - Dans un diagramme Mermaid, écrivez le jeton entre guillemets. Mermaid prend `<TOKEN>` pour une balise et le supprime.
 - Conservez les correspondances dans `sanitize.map`. Ce fichier est ignoré par Git.
 - Après un clone neuf, exécutez `tools/install-filters.sh` pour activer le filtre et le hook.
-- Avant de pousser, vérifiez qu'aucune valeur réelle ne figure dans l'historique.
-- N'utilisez jamais `git push --mirror` : cette commande publierait aussi les refs internes.
+- Les règles de poussée figurent dans la section « Les règles Git et de push ».
 - Le nom du tailnet reste en clair. Il figure dans l'URL du dépôt, donc le masquer n'ajouterait rien. Le domaine du tailnet reste masqué.
 
 Le tableau donne la légende des jetons.
@@ -94,6 +93,20 @@ Le tableau donne la légende des jetons.
 | `<OLD-NETNS>` | Ancien nom de l'espace réseau. |
 | `<ADMIN-ACCOUNT>` | Nom du compte d'administration SSH. |
 | `/Users/<LOCAL-USER>` | Répertoire du dépôt sur le poste local. |
+
+### Les règles Git et de push
+
+Ces règles couvrent la poussée du dépôt public et la protection des valeurs qui changent.
+
+- Poussez seulement avec l'accord explicite de l'utilisateur.
+- Poussez uniquement la branche `main`.
+- N'utilisez jamais `git push --mirror`. Cette commande publierait les refs internes.
+- Ne réécrivez pas l'historique déjà publié sans l'accord de l'utilisateur.
+- Purgez les refs `t3/*` avant chaque push. Expirez ensuite le reflog et vérifiez `git fsck`.
+- Vérifiez l'index avec `tools/check_leaks.py` avant de pousser. Le hook `pre-commit` fait ce contrôle à chaque commit.
+- Le hook `commit-msg` applique les mêmes contrôles aux messages de commit.
+- Quand l'adresse publique change, mettez à jour `sanitize.map` avec `tools/wan_ip.py update`.
+- Le hook `pre-commit` exécute `tools/wan_ip.py check`. Il bloque un commit qui contient l'adresse publique actuelle en clair.
 
 ### Le réseau
 
