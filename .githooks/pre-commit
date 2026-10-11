@@ -1,3 +1,6 @@
 #!/bin/sh
-# Filet de securite : refuse un commit dont l'index contient une valeur sensible.
-exec python3 "$(git rev-parse --show-toplevel)/tools/check_leaks.py"
+# Filet de securite : refuse un commit dont l'index contient une valeur
+# sensible ou l'adresse publique actuelle en clair.
+root=$(git rev-parse --show-toplevel)
+python3 "$root/tools/check_leaks.py" || exit 1
+exec python3 "$root/tools/wan_ip.py" check
