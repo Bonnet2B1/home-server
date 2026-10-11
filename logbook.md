@@ -561,3 +561,7 @@ L'adresse publique de la box peut changer sans prévenir. La table `sanitize.map
 Le hook `pre-commit` exécute le contrôle après `check_leaks.py`. La section « Les règles Git et de push » de [guidelines.md](guidelines.md) rassemble les règles de poussée liées à la confidentialité.
 
 Le contrôle a été vérifié sur dix scénarios, dont le blocage bout en bout d'un commit qui contenait l'adresse courante en clair. Le contrôle en conditions réelles du jour : l'adresse publique actuelle est couverte par la table.
+
+## La validation par les sous-agents, le 2026-10-12
+
+Une règle de validation est ajoutée à [guidelines.md](guidelines.md), section « Le cheminement d'une modification ». Une tâche n'est validée qu'après un audit en lecture seule par des sous-agents. L'audit reprend chaque critère et rend des constats par gravité. L'agent vérifie chaque constat avant de valider. Le nombre de sous-agents s'adapte au travail : un par partie au besoin. La règle généralise la pratique des quatre audits du 2026-10-11.

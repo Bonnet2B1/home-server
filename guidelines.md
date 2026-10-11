@@ -143,7 +143,7 @@ Avant une nouvelle fonction ou un correctif, inscrivez l'objectif et les critèr
 
 Si une modification produit une procédure de maintenance réutilisable, ajoutez-la dans [maintenance.md](maintenance.md). Si elle produit une nouvelle règle, ajoutez-la dans [guidelines.md](guidelines.md). Si elle change un principe du projet, mettez à jour [philosophy.md](philosophy.md).
 
-Une tâche est terminée lorsque ses critères sont vérifiés et que les documents concernés sont à jour. Retirez alors cette tâche de [todo.md](todo.md). Conservez son historique dans [logbook.md](logbook.md).
+Une tâche est terminée lorsque ses critères sont vérifiés et que les documents concernés sont à jour. Avant de valider les critères, faites auditer le travail par des sous-agents. L'audit est en lecture seule et reprend chaque critère. Il rend des constats par gravité. Vérifiez chaque constat avant de valider. Utilisez autant de sous-agents que nécessaire, un par partie du travail au besoin. Retirez alors cette tâche de [todo.md](todo.md). Conservez son historique dans [logbook.md](logbook.md).
 
 ### La pertinence et le minimalisme
 
