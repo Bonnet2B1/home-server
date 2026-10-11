@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
-from redact import redact_text  # noqa: E402
+from redact import redact_text, wrap_tokens  # noqa: E402
 
 SOURCE = "main"
 TARGET = "sanitize"
@@ -73,6 +73,10 @@ def main():
             except UnicodeDecodeError:
                 continue
             new = redact_text(text, "clean")
+            if path.endswith(b".md"):
+                # Un jeton ecrit en prose doit etre backtique : GitHub le
+                # traiterait sinon comme du HTML brut et l'effacerait.
+                new = wrap_tokens(new)
             if new == text:
                 continue
             h = git("hash-object", "-w", "--stdin",

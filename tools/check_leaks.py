@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
-from redact import load_map  # noqa: E402
+from redact import load_map, prose_tokens  # noqa: E402
 
 # Adresses legitimes, sans valeur identifiante.
 ALLOWED_IPV4 = {
@@ -72,6 +72,9 @@ def main():
             findings.append(f"{name} : adresse MAC « {m.group(0)} »")
         for m in SECRET.finditer(text):
             findings.append(f"{name} : secret potentiel « {m.group(0)} »")
+        if name.endswith(".md"):
+            for tok in prose_tokens(text):
+                findings.append(f"{name} : jeton en prose hors backticks « {tok} »")
     if findings:
         print("pre-commit : masquage incomplet, commit refuse.", file=sys.stderr)
         for f in sorted(set(findings)):

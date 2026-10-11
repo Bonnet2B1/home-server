@@ -1,54 +1,32 @@
 # Architecture : l'état présent du serveur
 
-```
-                        ┌──────────────┐
-                        │   INTERNET   │
-                        └──────▲───────┘
-                ┌──────────────┴───────────────┐
-                │                              │
-           Sortie <ISP-BOX>               Mode fast, deux sauts
-                ▲                              ▲
-                │                              │
- ┌──────────────┴──────────────────────────────┴────────────────┐
- │ NIVEAU 2 : LES SORTIES INTERNET                              │
- │                                                              │
- │ ┌────────────────────────┐   ┌─────────────────────────────┐ │
- │ │ VOIE 1 : DIRECTE       │   │ VOIE 2 : ANONYMISÉE         │ │
- │ │ exit-direct / tailscale│   │netns-nymvpn (espace partagé)│ │
- │ │ réseau de l'hôte       │   │                             │ │
- │ │                        │   │  ┌──────────────┐           │ │
- │ └────────────▲───────────┘   │  │tunnel-nymvpn │           │ │
- │              │               │  │tun0          │           │ │
- │              │               │  └──────────────┘           │ │
- │              │               │  ┌──────────────┐           │ │
- │              │               │  │exit-nymvpn   │           │ │
- │              │               │  │tailscale0    │           │ │
- │              │               │  └──────────────┘           │ │
- │              │               │                             │ │
- │              │               └──────────────▲──────────────┘ │
- └──────────────┼──────────────────────────────┼────────────────┘
-                │                              │
-                └──────────────┬───────────────┘
-                               │ choix dans l'application tailscale
-                ┌──────────────┴───────────────┐
-                │ TAILNET Bonnet2B1            │
-                │ iPhone <HOST-IPHONE>              │
-                │ MacBook <HOST-MACBOOK>             │
-                └──────────────────────────────┘
-
- ┌──────────────────────────────────────────────────────────────┐
- │ NIVEAU 1 : LE SOCLE COMMUN AUX DEUX VOIES                    │
- │ <SERVER-MODEL> / Alpine / Docker / SSH                          │
- │ eth0 : réseau principal / wlan0 : repli / uplink-guard       │
- └──────────────────────────────────────────────────────────────┘
-
- ┌──────────────────────────────────────────────────────────────┐
- │ NIVEAU 3 : APPLICATIONS HÉBERGÉES, AUCUN SERVICE DÉPLOYÉ     │
- └──────────────────────────────────────────────────────────────┘
-
+```mermaid
+flowchart BT
+    INT["INTERNET"]
+    subgraph N2["NIVEAU 2 : SORTIES"]
+        V1["VOIE 1 : DIRECTE<br/>exit-direct / tailscale<br/>réseau de l'hôte"]
+        V2["VOIE 2 : ANONYMISÉE<br/>netns-nymvpn (espace partagé)<br/>tunnel-nymvpn / tun0<br/>exit-nymvpn / tailscale0"]
+    end
+    subgraph N1["NIVEAU 1 : SOCLE"]
+        SOCLE["« SERVER-MODEL » / Alpine / Docker / SSH<br/>eth0 : réseau principal / wlan0 : repli<br/>uplink-guard"]
+    end
+    subgraph N0["NIVEAU 0 : APPAREILS"]
+        PH["iPhone « HOST-IPHONE »"]
+        MB["MacBook « HOST-MACBOOK »"]
+    end
+    subgraph N3["NIVEAU 3 : APPLICATIONS HÉBERGÉES"]
+        NONE["aucun service déployé"]
+    end
+    SOCLE --> V1
+    SOCLE --> V2
+    V1 --> INT
+    V2 --> INT
+    PH --> SOCLE
+    MB --> SOCLE
+    SOCLE -.-> NONE
 ```
 
-Le schéma présente les chemins logiques du trafic et le socle qui les héberge. Les deux voies partagent le laptop et sa liaison réseau. Chaque appareil du tailnet choisit sa voie dans l'application Tailscale.
+Le schéma présente les chemins logiques du trafic et le socle qui les héberge. Les deux voies partagent le laptop et sa liaison réseau. Chaque appareil du tailnet choisit sa voie dans l'application Tailscale. Les noms entre guillemets sont des jetons de masquage ; la légende se trouve dans [guidelines.md](guidelines.md), section « Le masquage avant publication ».
 
 ## Niveau 1 : le socle
 
@@ -84,7 +62,7 @@ L'authentification utilise une clé seule. `PasswordAuthentication` vaut `no`. L
 
 ## Niveau 2 : les sorties Internet
 
-Le tailnet Bonnet2B1 contient deux exit nodes, `exit-direct` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
+Le tailnet `<TAILNET-NAME>` contient deux exit nodes, `exit-direct` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
 
 ### La sortie directe : exit-direct
 

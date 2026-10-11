@@ -58,6 +58,8 @@ Le dépôt est publié sur GitHub. Avant publication, masquez toute valeur qui i
 
 - Écrivez les valeurs réelles dans le dépôt local. Le filtre les remplace par des jetons au commit.
 - Utilisez un jeton stable pour une même entité, sur toutes ses occurrences.
+- En prose, entourez le jeton de backticks. GitHub interprète `<TOKEN>` comme du HTML brut et l'efface à l'affichage.
+- Dans un diagramme Mermaid, écrivez le jeton entre guillemets. Mermaid prend `<TOKEN>` pour une balise et le supprime.
 - Conservez les correspondances dans `sanitize.map`. Ce fichier est ignoré par Git.
 - Après un clone neuf, exécutez `tools/install-filters.sh` pour activer le filtre et le hook.
 - Avant de pousser, vérifiez qu'aucune valeur réelle ne figure dans l'historique.
@@ -85,6 +87,7 @@ Le tableau donne la légende des jetons.
 | `<HOST-MACBOOK>` | Nom du client MacBook. |
 | `<HOST-IPHONE>` | Nom du client iPhone. |
 | `<SERVER-MODEL>` | Modèle du laptop serveur. |
+| `<SERVER-BRAND>` | Marque du laptop serveur. |
 | `<OLD-SERVER-NAME>` | Ancien nom d'hôte du serveur. |
 | `<OLD-NODE-EXIT-NYMVPN>` | Ancien nom du conteneur de sortie Nym. |
 | `<OLD-NETNS>` | Ancien nom de l'espace réseau. |
