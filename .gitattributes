@@ -1,0 +1,10 @@
+# Le filtre 'redact' masque les valeurs sensibles au commit (clean)
+# et les restaure dans l'arbre de travail (smudge).
+# Voir tools/install-filters.sh et guidelines.md, section « Le masquage ».
+*.md filter=redact
+*.sh filter=redact
+*.yaml filter=redact
+*.yml filter=redact
+*.rules filter=redact
+*.example filter=redact
+Dockerfile* filter=redact

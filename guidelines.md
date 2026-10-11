@@ -52,6 +52,44 @@ Ce fichier évolue avec le projet, comme le reste de la documentation. Avant de 
 - Traitez les sorties contenant des secrets comme des données sensibles.
 - Avant de partager une sortie ou de la consigner, masquez les secrets.
 
+### Le masquage avant publication
+
+Le dépôt est publié sur GitHub. Avant publication, masquez toute valeur qui identifie l'utilisateur ou son réseau. Un filtre Git applique le masquage au commit. Un hook `pre-commit` vérifie l'index.
+
+- Écrivez les valeurs réelles dans le dépôt local. Le filtre les remplace par des jetons au commit.
+- Utilisez un jeton stable pour une même entité, sur toutes ses occurrences.
+- Conservez les correspondances dans `sanitize.map`. Ce fichier est ignoré par Git.
+- Après un clone neuf, exécutez `tools/install-filters.sh` pour activer le filtre et le hook.
+- Avant de pousser, vérifiez qu'aucune valeur réelle ne figure dans l'historique.
+- N'utilisez jamais `git push --mirror` : cette commande publierait aussi les refs internes.
+
+Le tableau donne la légende des jetons.
+
+| Jeton | Valeur masquée |
+|---|---|
+| `<WAN-IP-BOX-A>`, `<WAN-IP-BOX-B>` | Adresses publiques de la box, relevées à deux dates. |
+| `<ISP>`, `<ISP-BOX>` | Fournisseur d'accès Internet et sa box. |
+| `<TAILNET-NAME>` | Nom du tailnet. |
+| `<TAILNET-IP-EXIT-DIRECT>` | Adresse Tailscale du nœud de sortie directe. |
+| `<TAILNET-IP-EXIT-NYMVPN>` | Adresse Tailscale du nœud de sortie Nym. |
+| `<TAILNET-IP-CLIENT>` | Adresse Tailscale du client MacBook. |
+| `<TAILNET-IP-TS-TEST>` | Adresse Tailscale du client de test. |
+| `<TAILNET-IP-OLD-IDENTITY>` | Ancienne adresse Tailscale d'un nœud retiré. |
+| `<LAN-SUBNET>` | Sous-réseau du réseau local. |
+| `<LAN-IP-SERVER>` | Adresse locale du serveur. |
+| `<LAN-IP-WIFI>` | Adresse locale de l'interface Wi-Fi. |
+| `<LAN-GATEWAY-IP>` | Adresse locale de la box. |
+| `<COLIMA-GATEWAY-IP>` | Adresse de la passerelle de l'environnement Colima. |
+| `<DOCKER-INTERNAL-IP>` | Adresse interne d'un réseau Docker. |
+| `<MAC-ETH0>` | Adresse matérielle de l'interface Ethernet. |
+| `<HOST-MACBOOK>` | Nom du client MacBook. |
+| `<HOST-IPHONE>` | Nom du client iPhone. |
+| `<SERVER-MODEL>` | Modèle du laptop serveur. |
+| `<OLD-SERVER-NAME>` | Ancien nom d'hôte du serveur. |
+| `<OLD-NODE-EXIT-NYMVPN>` | Ancien nom du conteneur de sortie Nym. |
+| `<OLD-NETNS>` | Ancien nom de l'espace réseau. |
+| `<ADMIN-ACCOUNT>` | Nom du compte d'administration SSH. |
+
 ### Le réseau
 
 - Séparez l'espace réseau de la voie anonymisée de celui de l'hôte.

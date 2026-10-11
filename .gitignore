@@ -1,0 +1,6 @@
+# Fichiers locaux de masquage — ne jamais committer les valeurs reelles.
+sanitize.map
+*.local.md
+
+# Secrets locaux
+.env
