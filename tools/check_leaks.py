@@ -116,13 +116,7 @@ def check_index():
 def check_message(path):
     text = Path(path).read_text(encoding="utf-8", errors="replace")
     findings = []
-    for real in reals():
-        if re.search(value_regex(real), text):
-            findings.append(f"message : valeur reelle « {real} »")
-    for m in SECRET.finditer(text):
-        findings.append(f"message : secret potentiel « {m.group(0)} »")
-    for tok in prose_tokens(text):
-        findings.append(f"message : jeton en prose hors backticks « {tok} »")
+    check_text(text, "message", findings, is_markdown=True)
     return findings
 
 

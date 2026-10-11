@@ -565,3 +565,9 @@ Le contrôle a été vérifié sur dix scénarios, dont le blocage bout en bout 
 ## La validation par les sous-agents, le 2026-10-12
 
 Une règle de validation est ajoutée à [guidelines.md](guidelines.md), section « Le cheminement d'une modification ». Une tâche n'est validée qu'après un audit en lecture seule par des sous-agents. L'audit reprend chaque critère et rend des constats par gravité. L'agent vérifie chaque constat avant de valider. Le nombre de sous-agents s'adapte au travail : un par partie au besoin. La règle généralise la pratique des quatre audits du 2026-10-11.
+
+## La correction du contrôle des messages, le 2026-10-12
+
+L'audit des sous-agents du jour a relevé un écart : le hook `commit-msg` ne contrôlait pas les adresses IP et MAC dans le message, alors que le hook `pre-commit` les contrôlait dans l'index. Une adresse publique nouvelle, absente de la table, écrite dans un message de commit échappait à toutes les mailles.
+
+Correction du jour : `check_message` passe par les mêmes contrôles que l'index, valeurs réelles, IP, MAC, secrets et jetons compris. `wan_ip.py check` accepte un fichier de message (`--text`) et bloque un message qui contient l'adresse publique actuelle en clair. Le hook `commit-msg` exécute les deux contrôles. La couverture est vérifiée sur treize scénarios, dont le blocage bout en bout par `wan_ip check --text`.

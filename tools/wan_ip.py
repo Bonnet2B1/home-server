@@ -6,17 +6,19 @@ sanitize.map ne contient que les valeurs ecrites : une adresse nouvelle
 n'y figure pas, et ni le filtre ni le hook ne la connaissent.
 
 Usage :
-  wan_ip.py check   -- branche sur le hook pre-commit. Lit l'adresse
-                      publique actuelle, verifie qu'elle est couverte par
-                      la table ou publiquement assumee, et bloque un commit
-                      dont l'index contient cette adresse en clair. Sans
-                      reseau, il previent et finit par 0 : il ne bloque pas.
+  wan_ip.py check   -- branche sur les hooks pre-commit et commit-msg.
+                      Lit l'adresse publique actuelle, verifie qu'elle est
+                      couverte par la table ou publiquement assumee, et
+                      bloque un commit dont l'index (ou le message avec
+                      --text) contient cette adresse en clair. Sans reseau,
+                      il previent et finit par 0 : il ne bloque pas.
   wan_ip.py update  -- remplace la valeur reelle du jeton de la box A par
                       l'adresse publique actuelle dans sanitize.map.
                       Ne fait rien sans reseau.
 
 Reparation ou test manuels :
   wan_ip.py check --ip <adresse>
+  wan_ip.py check --text <fichier-message> --ip <adresse>
   wan_ip.py update --ip <adresse> --token <JETON>
 """
 import ipaddress
@@ -62,7 +64,7 @@ def is_covered(ip):
     return ip in ALLOWED_IPV4
 
 
-def check(ip):
+def check(ip, text=None):
     if ip is None:
         print("wan_ip : adresse publique illisible (reseau ?). "
               "Verification differee.", file=sys.stderr)
@@ -70,11 +72,24 @@ def check(ip):
     if is_covered(ip):
         print("wan_ip : adresse publique couverte par la table.")
         return 0
+    needle = ip.encode("latin-1")
+    if text is not None:
+        blob = Path(text).read_bytes()
+        if needle in blob:
+            print(f"wan_ip : l'adresse publique actuelle {ip} figure en "
+                  f"clair dans le message ({Path(text).name}). Ajoutez-la "
+                  "a sanitize.map (python3 tools/wan_ip.py update), puis "
+                  "recommencez.", file=sys.stderr)
+            return 1
+        print(f"wan_ip : adresse publique {ip} non couverte et absente du "
+              "message. Mettez la table a jour avant de la mentionner "
+              "(python3 tools/wan_ip.py update).", file=sys.stderr)
+        return 0
     for path in staged_files():
         res = staged_blob(path)
         if res.returncode != 0:
             continue
-        if ip.encode("latin-1") in res.stdout:
+        if needle in res.stdout:
             name = path.decode("utf-8", "replace")
             print(f"wan_ip : l'adresse publique actuelle {ip} figure en "
                   f"clair dans l'index ({name}). Ajoutez-la a sanitize.map "
@@ -125,8 +140,12 @@ def main():
     if "--ip" in args:
         i = args.index("--ip")
         ip = args[i + 1] if len(args) > i + 1 else None
+    text = None
+    if "--text" in args:
+        i = args.index("--text")
+        text = args[i + 1] if len(args) > i + 1 else None
     if mode == "check":
-        return check(fetch_ip(fast=True) if ip is None else ip)
+        return check(fetch_ip(fast=True) if ip is None else ip, text=text)
     if mode == "update":
         token = DEFAULT_TOKEN
         if "--token" in args:

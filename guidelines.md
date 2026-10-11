@@ -106,7 +106,8 @@ Ces règles couvrent la poussée du dépôt public et la protection des valeurs 
 - Vérifiez l'index avec `tools/check_leaks.py` avant de pousser. Le hook `pre-commit` fait ce contrôle à chaque commit.
 - Le hook `commit-msg` applique les mêmes contrôles aux messages de commit.
 - Quand l'adresse publique change, mettez à jour `sanitize.map` avec `tools/wan_ip.py update`.
-- Le hook `pre-commit` exécute `tools/wan_ip.py check`. Il bloque un commit qui contient l'adresse publique actuelle en clair.
+- Le hook `pre-commit` exécute `tools/check_leaks.py`, puis `tools/wan_ip.py check` sur l'index.
+- Le hook `commit-msg` exécute aussi `tools/wan_ip.py check --text` sur le message. Les deux bloquent un commit qui contient l'adresse publique actuelle en clair.
 
 ### Le réseau
 
