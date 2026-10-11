@@ -64,6 +64,7 @@ Le dépôt est publié sur GitHub. Avant publication, masquez toute valeur qui i
 - Après un clone neuf, exécutez `tools/install-filters.sh` pour activer le filtre et le hook.
 - Avant de pousser, vérifiez qu'aucune valeur réelle ne figure dans l'historique.
 - N'utilisez jamais `git push --mirror` : cette commande publierait aussi les refs internes.
+- Le nom du tailnet reste en clair. Il figure dans l'URL du dépôt, donc le masquer n'ajouterait rien. Le domaine du tailnet reste masqué.
 
 Le tableau donne la légende des jetons.
 
@@ -71,7 +72,6 @@ Le tableau donne la légende des jetons.
 |---|---|
 | `<WAN-IP-BOX-A>`, `<WAN-IP-BOX-B>` | Adresses publiques de la box, relevées à deux dates. |
 | `<ISP>`, `<ISP-BOX>` | Fournisseur d'accès Internet et sa box. |
-| `<TAILNET-NAME>` | Nom du tailnet. |
 | `<TAILNET-DOMAIN>` | Domaine du tailnet. |
 | `<TAILNET-IP-EXIT-DIRECT>` | Adresse Tailscale du nœud de sortie directe. |
 | `<TAILNET-IP-EXIT-NYMVPN>` | Adresse Tailscale du nœud de sortie Nym. |

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 from redact import redact_text, wrap_tokens  # noqa: E402
 
-SOURCE = "main"
+SOURCE = os.environ.get("REWRITE_SOURCE", "main")
 TARGET = "sanitize"
 NAME = "Eli"
 EMAIL = "eli@users.noreply.github.com"

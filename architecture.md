@@ -62,7 +62,7 @@ L'authentification utilise une clé seule. `PasswordAuthentication` vaut `no`. L
 
 ## Niveau 2 : les sorties Internet
 
-Le tailnet `<TAILNET-NAME>` contient deux exit nodes, `exit-direct` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
+Le tailnet `Bonnet2B1` contient deux exit nodes, `exit-direct` et `exit-nymvpn`. L'iPhone `<HOST-IPHONE>` et le MacBook `<HOST-MACBOOK>` utilisent ces sorties. Les nœuds ont des adresses Tailscale et des espaces réseau distincts.
 
 ### La sortie directe : exit-direct
 
