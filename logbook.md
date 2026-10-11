@@ -534,6 +534,16 @@ Le schéma d'`architecture.md` était dessiné à la main, en largeur fixe. Le m
 
 Le dépôt contient trente-deux commits et trente-deux fichiers. Un clone neuf du dépôt public ne contient aucune valeur masquée, dans les arbres comme dans les messages de commit. Il n'expose que `main`. Les étapes et les critères ont été inscrits dans [todo.md](todo.md) avant le travail, puis retirés une fois vérifiés, conformément au cheminement d'une modification défini dans [guidelines.md](guidelines.md).
 
+## L'incident du logbook tronqué, 2026-10-11
+
+La consignation de la publication a d'abord échoué. Un script de consignation a réécrit `logbook.md` au lieu d'ajouter la section : le fichier est tombé de 501 à 35 lignes.
+
+Le commit fautif, `f802ca2`, a été poussé avant la vérification. Pendant quelques minutes, le dépôt public montrait un logbook réduit à la seule section de publication. La vérification des renvois a révélé l'écart : la décision « Le repo GitHub est privé », attendue au tableau des choix, manquait.
+
+Le fichier sain a été restauré depuis l'historique, puis la section ajoutée en mode ajout. Le diff avec la version saine compte trente-quatre lignes ajoutées et aucune supprimée. Le commit `2a6529d` répare l'état. Le commit fautif reste dans l'historique public : l'incident y demeure lisible.
+
+Aucune valeur sensible n'a été exposée. La perte était une disparition de contenu, pas une fuite. La leçon : le contrôle avant un push porte sur les fuites, mais aussi sur la forme des fichiers. Un comptage de lignes aurait suffi à l'arrêter.
+
 ## Les corrections de l'outillage, le 2026-10-11
 
 Quatre audits indépendants ont passé en revue le dépôt publié, le masquage et l'outillage. Le dépôt public ne contenait aucune valeur identifiante. L'outillage présentait des défauts, corrigés le jour même.
