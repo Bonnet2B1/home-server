@@ -1,0 +1,4 @@
+#!/bin/sh
+# Filet de securite : refuse un message de commit qui contient une valeur
+# sensible ou un jeton ecrit en prose sans backticks.
+exec python3 "$(git rev-parse --show-toplevel)/tools/check_leaks.py" --commit-msg "$1"

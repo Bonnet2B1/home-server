@@ -7,4 +7,9 @@
 *.yml filter=redact
 *.rules filter=redact
 *.example filter=redact
+*.py filter=redact
 Dockerfile* filter=redact
+LICENSE filter=redact
+.gitignore filter=redact
+.dockerignore filter=redact
+.githooks/* filter=redact

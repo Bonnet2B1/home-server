@@ -42,7 +42,8 @@ def main():
     if index.exists():
         index.unlink()
 
-    commits = git("rev-list", "--reverse", SOURCE).stdout.decode().split()
+    # --topo-order : les parents precedent les enfants, meme avec des fusions.
+    commits = git("rev-list", "--topo-order", "--reverse", SOURCE).stdout.decode().split()
     mapping = {}
     for old in commits:
         raw = git("cat-file", "-p", old).stdout.decode("utf-8", "replace")
@@ -103,7 +104,14 @@ def main():
         print(f"{old[:8]} -> {new_sha[:8]}", file=sys.stderr)
 
     head = mapping[commits[-1]]
-    git("update-ref", f"refs/heads/{TARGET}", head)
+    target = f"refs/heads/{TARGET}"
+    exists = subprocess.run(
+        ["git", "show-ref", "--verify", "--quiet", target],
+        cwd=ROOT, capture_output=True,
+    ).returncode == 0
+    if exists and os.environ.get("REWRITE_FORCE") != "1":
+        sys.exit(f"refus : {TARGET} existe deja ; REWRITE_FORCE=1 pour ecraser")
+    git("update-ref", target, head)
     if index.exists():
         index.unlink()
     print(f"\n{TARGET} -> {head}", file=sys.stderr)
