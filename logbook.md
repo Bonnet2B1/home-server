@@ -514,7 +514,7 @@ Un filtre Git fait la conversion dans les deux sens. Au commit, `redact` remplac
 
 ### L'anonymisation de l'historique
 
-Les vingt-quatre commits d'origine ont été réécrits : contenu, auteur et message. Les dates d'auteur et de commiteur sont conservées. Tous les commits portent l'identité `Eli <eli@users.noreply.github.com>`, qui remplace l'adresse personnelle d'origine.
+Les vingt-huit commits d'origine ont été réécrits : contenu, auteur et message. Les dates d'auteur et de commiteur sont conservées. Tous les commits portent l'identité `Eli <eli@users.noreply.github.com>`, qui remplace l'adresse personnelle d'origine.
 
 Les sommes de contrôle de tous les commits changent. L'historique d'origine ne subsiste que dans une sauvegarde locale. Les refs internes de l'agent contenaient l'historique non anonymisé. Elles ont été supprimées, avec le reflog et les objets orphelins, avant la publication. Seule `main` a été poussée.
 
@@ -533,3 +533,11 @@ Le schéma d'`architecture.md` était dessiné à la main, en largeur fixe. Le m
 ### Le dépôt public
 
 Le dépôt contient trente-deux commits et trente-deux fichiers. Un clone neuf du dépôt public ne contient aucune valeur masquée, dans les arbres comme dans les messages de commit. Il n'expose que `main`. Les étapes et les critères ont été inscrits dans [todo.md](todo.md) avant le travail, puis retirés une fois vérifiés, conformément au cheminement d'une modification défini dans [guidelines.md](guidelines.md).
+
+## Les corrections de l'outillage, le 2026-10-11
+
+Quatre audits indépendants ont passé en revue le dépôt publié, le masquage et l'outillage. Le dépôt public ne contenait aucune valeur identifiante. L'outillage présentait des défauts, corrigés le jour même.
+
+Un contrôle vient s'ajouter au hook `pre-commit` : un hook `commit-msg` refuse un message de commit qui contient une valeur réelle ou un jeton écrit en prose sans backticks. `check_leaks.py` ne plante plus sur une adresse invalide, et les fichiers binaires ne lui échappent plus : il y cherche les valeurs à fort signal. La détection des adresses MAC accepte les tirets, pas seulement les deux-points. Le filtre et le hook partagent la même règle de frontière : une valeur collée à un autre caractère est masquée, donc le commit n'est plus bloqué sans issue. Les jetons dans un lien Markdown ou dans une URL ne sont ni backtiqués ni signalés. `rewrite_history.py` gère les fusions et refuse d'écraser la branche `sanitize` sans `REWRITE_FORCE=1`. La couverture du filtre s'étend aux `*.py`, à `.gitignore`, à `.dockerignore`, à `LICENSE` et aux hooks.
+
+La section « Les défauts connus, non corrigés » de [todo.md](todo.md) est retirée : un défaut connu devient un travail fait immédiatement, pas une catégorie d'attente. Le chiffre « vingt-quatre commits d'origine » est corrigé en « vingt-huit », le compte relevé dans la sauvegarde.
