@@ -34,8 +34,13 @@ SECRET = re.compile(r"tskey-[A-Za-z0-9]|-----BEGIN [A-Z ]*PRIVATE KEY-----")
 
 
 def staged_files():
+    # Exclut les suppressions : un fichier supprime n'a plus de blob a
+    # l'index (git show :<chemin> echoue) et rien de son contenu n'entre
+    # dans le nouveau commit. ACMR couvre ajouts, copies, modifs et
+    # renommages.
     out = subprocess.run(
-        ["git", "diff", "--cached", "--name-only", "-z"],
+        ["git", "diff", "--cached", "--diff-filter=ACMR",
+         "--name-only", "-z"],
         cwd=ROOT, capture_output=True, check=True,
     ).stdout
     return [p for p in out.split(b"\0") if p]
