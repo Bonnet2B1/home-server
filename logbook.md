@@ -571,3 +571,25 @@ Une règle de validation est ajoutée à [guidelines.md](guidelines.md), section
 L'audit des sous-agents du jour a relevé un écart : le hook `commit-msg` ne contrôlait pas les adresses IP et MAC dans le message, alors que le hook `pre-commit` les contrôlait dans l'index. Une adresse publique nouvelle, absente de la table, écrite dans un message de commit échappait à toutes les mailles.
 
 Correction du jour : `check_message` passe par les mêmes contrôles que l'index, valeurs réelles, IP, MAC, secrets et jetons compris. `wan_ip.py check` accepte un fichier de message (`--text`) et bloque un message qui contient l'adresse publique actuelle en clair. Le hook `commit-msg` exécute les deux contrôles. La couverture est vérifiée sur treize scénarios, dont le blocage bout en bout par `wan_ip check --text`.
+
+## L'abandon du filtrage DNS, 2026-10-12
+
+Le filtrage publicitaire au niveau DNS est abandonné. La conception prévoyait un résolveur AdGuard Home sur le serveur, déclaré en nameserver global du tailnet, avec un conteneur compagnon Tailscale et un amont en DoT ou DoH.
+
+L'utilisateur a demandé l'abandon le 2026-10-12. La conception reposait sur une chaîne de décisions prises avant la compréhension du mécanisme DNS. Une fois ce trajet compris, l'utilisateur a jugé cette chaîne bâtie sur des réponses données sans connaissance, donc sans valeur. Il a préféré l'effacer plutôt que la poursuivre.
+
+Ce qui a été retiré du dépôt :
+
+- Le dossier `adguard/` : le compose, `verif.sh`, `.env.example` et `.gitignore`.
+- La tâche « Le réglage DNS d'AdGuard Home » de [todo.md](todo.md).
+- La tâche « Le microservice AdGuard Home » de [todo.md](todo.md).
+- La ligne correspondante de [readme.md](readme.md).
+
+Ce qui a été conservé et détaché d'AdGuard, car une autre tâche s'en sert :
+
+- Le gabarit d'un microservice, devenu la section du même nom dans [todo.md](todo.md). La tâche WoL s'y réfère.
+- La tâche « Les modes d'accès d'un microservice », qui vaut pour WoL.
+
+Rien n'a été retiré du serveur. AdGuard Home n'a jamais été déployé et `verif.sh` n'a jamais été exécuté. Aucun conteneur, volume, image ni nœud de tailnet ne porte ce nom.
+
+Les décisions antérieures qui portaient sur AdGuard restent consignées comme historique : la ligne du tableau « Les choix technologiques » (AdGuard Home, phase C) et la ligne « DNS » des « décisions actées ». Elles sont caduques à compter de cette date.

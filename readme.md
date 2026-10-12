@@ -24,7 +24,6 @@ Cet aperçu regroupe les fonctions du serveur. Les étapes et les critères dét
 - [x] Ethernet : liaison principale, avec le Wi-Fi en repli.
 - [x] Tailscale : accès privé au serveur et sortie Internet directe.
 - [x] Mode fast : sortie Internet par l'anonymiseur Nym.
-- [ ] [AdGuard Home](todo.md#le-microservice-adguard-home) : filtrage des requêtes DNS.
 - [ ] [WoL](todo.md#le-microservice-wol) : réveil d'un ordinateur à distance.
 - [ ] [ntfy](todo.md#la-surveillance-et-les-notifications-avec-ntfy) : alertes de coupure de l'anonymiseur ou de courant.
 - [ ] [Nym mixnet](todo.md#le-conteneur-nym-pour-le-mixnet) : conteneur dédié au mixnet.

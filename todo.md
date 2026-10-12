@@ -33,36 +33,13 @@ La liste des pays est sourcée et approuvée. Les données de localisation trans
 
 ## Les étapes communes
 
-Ces étapes concernent les deux voies. Elles ne font partie d'aucune phase. Six étapes restent ouvertes.
-
-### Le réglage DNS d'AdGuard Home
-
-#### Objectif
-
-Définir le réglage DNS d'AdGuard Home. Le réglage doit éviter toute boucle de résolution par le tailnet.
-
-#### Conditions
-
-Le déploiement d'AdGuard Home déclenche cet arbitrage. Les sources définissent `TS_ACCEPT_DNS=false` et le gabarit prévoyait `100.100.100.100`.
-
-#### Étapes
-
-- [ ] Choisissez un réglage sans boucle DNS.
-- [ ] Définissez le résolveur amont selon le choix de sortie.
-- [ ] Vérifiez la compatibilité avec la sortie choisie.
-- [ ] Vérifiez le fonctionnement DNS avant la fin de la tâche.
-
-#### Critères de réussite
-
-- [ ] La résolution par le tailnet ne boucle pas.
-- [ ] Le réglage est compatible avec la sortie choisie.
-- [ ] Le fonctionnement DNS est vérifié avant la fin.
+Ces étapes concernent les deux voies. Elles ne font partie d'aucune phase. Quatre étapes restent ouvertes.
 
 ### Le DNS de l'hôte lors d'une récupération
 
 #### Objectif
 
-Trancher le choix du DNS de l'hôte lors d'une récupération. La voie 1 donne l'accès distant au serveur. Cette décision concerne le DNS de l'hôte, pas le DNS du futur service AdGuard. L'ancienne procédure proposait un résolveur public si `/etc/resolv.conf` pointait vers `100.100.100.100`. Cette piste a été écartée le 2026-10-03 au profit d'un diagnostic d'identité non persistante.
+Trancher le choix du DNS de l'hôte lors d'une récupération. La voie 1 donne l'accès distant au serveur. Cette décision concerne le DNS de l'hôte, pas un service de filtrage. L'ancienne procédure proposait un résolveur public si `/etc/resolv.conf` pointait vers `100.100.100.100`. Cette piste a été écartée le 2026-10-03 au profit d'un diagnostic d'identité non persistante.
 
 #### Conditions
 
@@ -89,7 +66,7 @@ Le diagnostic est dans [logbook.md](logbook.md), section « La résolution du 20
 
 #### Objectif
 
-Énumérer les modes d'accès possibles d'un microservice. Les tâches AdGuard Home et WoL demandent ce choix avant toute installation.
+Énumérer les modes d'accès possibles d'un microservice. La tâche WoL demande ce choix avant toute installation.
 
 #### Conditions
 
@@ -105,7 +82,7 @@ Le mode d'accès décide du pare-feu et de la sortie du compagnon. Aucun mode n'
 #### Critères de réussite
 
 - [ ] Chaque mode porte une adresse d'écoute et une règle d'accès.
-- [ ] Les tâches AdGuard Home et WoL citent un mode choisi.
+- [ ] La tâche WoL cite un mode choisi.
 - [ ] Le glossaire définit le terme « mode d'accès ».
 
 ### Le trajet DNS de chaque voie
@@ -116,7 +93,7 @@ Documenter où un appareil résout un nom, pour la voie 1 et pour la voie 2. Auc
 
 #### Conditions
 
-L'arbitrage DNS reste ouvert dans la tâche « Le réglage DNS d'AdGuard Home ».
+Les deux voies sont en service. Le trajet dépend du réglage DNS de l'appareil et de l'exit node choisi.
 
 #### Étapes
 
@@ -210,7 +187,7 @@ Projets, dossiers et volumes :
 - L'accès au serveur par le repli LAN (`<LAN-IP-SERVER>`) est vérifié avant la porte de la voie 1. Recréer la voie 1 depuis une session qui passe par elle coupe l'SSH.
 - Les anciens volumes restent sur le serveur jusqu'au vert final. Ils ne sont supprimés qu'après la vérification d'ensemble.
 - Chaque palier est commité dans le dépôt, scripts et docs à jour dans le même palier.
-- Hors périmètre : adguard (service `tailscale`, conteneur `adguard-tailscale`, nœud `adguard`), la machine `<OLD-SERVER-NAME>`, les mots-produits (`tailscale`, `nym`, `nymvpn`, `netns` comme logiciel, image, commande ou concept), les clients de diagnostic `ts-client` / `ts-test`, les adresses `<TAILNET-IP-EXIT-DIRECT>` et `<TAILNET-IP-EXIT-NYMVPN>`.
+- Hors périmètre : la machine `<OLD-SERVER-NAME>`, les mots-produits (`tailscale`, `nym`, `nymvpn`, `netns` comme logiciel, image, commande ou concept), les clients de diagnostic `ts-client` / `ts-test`, les adresses `<TAILNET-IP-EXIT-DIRECT>` et `<TAILNET-IP-EXIT-NYMVPN>`.
 - logbook.md reste intact. Une note datée documente le changement à la fin.
 - Jamais de suppression par motif : conteneurs et volumes sont désignés par leurs noms exacts. Un motif réutiliserait le piège du 2026-10-01.
 
@@ -224,14 +201,14 @@ Projets, dossiers et volumes :
   - [x] Mise à jour de `docker-compose.yaml` : `name: exit-nymvpn` ; services `netns` → `netns-nymvpn` (conteneur et `hostname`), `nym` → `tunnel-nymvpn`, `tailscale` → `exit-nymvpn` ; références `network_mode: "service:netns-nymvpn"` et `depends_on` suivent ; `--hostname=exit-nymvpn`.
   - [x] Redémarrage : `docker compose up -d` depuis le nouveau dossier.
   - [x] Porte A : côté serveur ✓ (`docker ps` aux noms exacts, IP `<TAILNET-IP-EXIT-NYMVPN>` sur `exit-nymvpn`, `nym-vpnc` Connected, exit node approuvé, grep des anciens identifiants → 0 hit) ; côté clients ✓ relais vérifié par loop.sh sur la cible `exit-nymvpn` (VERDICT VERT, IP `<WAN-IP-BOX-A>` → 57.131.28.186) ; reste au moment où `<HOST-IPHONE>`/`<HOST-MACBOOK>` se reconnectent : re-sélection de `exit-nymvpn` dans l'app.
-  - [x] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `adguard/verif.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
+  - [x] Mise à jour des scripts et docs du dépôt pour la voie 2 (`test-client.sh`, `loop.sh`, `maintenance.md`, `architecture.md`, dossier `tailscale-nym/` → `exit-nymvpn/`), commit.
 - [x] Palier B — voie 1 :
   - [x] Revérifier l'SSH par le LAN.
   - [x] Mêmes opérations que le palier A pour `/opt/tailscale` → `/opt/exit-direct` : volume `tailscale_state` → `exit-direct_state` *(CLI sans `volume rename` → `volume create` + `cp -a` + `diff -r` + sha256 identiques ; ancien volume conservé jusqu'au vert final)*, service et conteneur `tailscale` → `exit-direct`, `--hostname=exit-direct`.
   - [x] Porte B : côté serveur ✓ (`docker ps` aux noms exacts ; IP `<TAILNET-IP-EXIT-DIRECT>` inchangée sur `exit-direct` ; `<OLD-SERVER-NAME>` n'existe plus ; grep 0 ancien identifiant) ; SSH LAN ✓ ; SSH par Tailscale ✓ de bout en bout depuis le Mac : `ssh <ADMIN-ACCOUNT>@<TAILNET-IP-EXIT-DIRECT>` répond (`<OLD-SERVER-NAME>`), validé après retour de `<HOST-MACBOOK>` sur le tailnet (sortie directe `exit-direct` sélectionnée, `ExitNodeAllowLANAccess` actif).
   - [x] Mise à jour des docs restantes (dossier `tailscale/` → `exit-direct/`, maintenance.md, architecture.md), commit.
 - [x] Vérification finale :
-  - [x] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn` : verdicts attendus du nœud direct et `VERT` anonymisé, IP `<WAN-IP-BOX-A>` → `57.131.28.186`), le tunnel est connecté, l'SSH LAN fonctionne. *(adguard : N/A, non déployé. SSH par tailnet : validé de bout en bout depuis `<HOST-MACBOOK>` le 2026-10-10.)*
+  - [x] Les deux sorties fonctionnent (loop.sh sur `exit-direct` et `exit-nymvpn` : verdicts attendus du nœud direct et `VERT` anonymisé, IP `<WAN-IP-BOX-A>` → `57.131.28.186`), le tunnel est connecté, l'SSH LAN fonctionne. *(SSH par tailnet : validé de bout en bout depuis `<HOST-MACBOOK>` le 2026-10-10.)*
   - [x] Note datée dans logbook.md.
 - [x] Nettoyage (après vert final) : suppression des volumes orphelins par noms exacts (`tailscale-nym_state`, `tailscale-nym_nym-data`, `tailscale-nym_ts-sock`, `tailscale_state`).
 
@@ -239,8 +216,8 @@ Projets, dossiers et volumes :
 
 - [ ] Chaque service porte un nom de rôle : `exit-direct`, `netns-nymvpn`, `tunnel-nymvpn`, `exit-nymvpn`.
 - [ ] L'identité est conservée : mêmes adresses Tailscale (`<TAILNET-IP-EXIT-DIRECT>`, `<TAILNET-IP-EXIT-NYMVPN>`), mêmes graines Nym, exit nodes toujours approuvés. Si une porte révèle une identité changée, la nouvelle identité est intégrée : approbations refaites, resélection des clients, adresses mises à jour dans les docs.
-- [ ] Aucune référence ancienne ne subsiste dans les configurations, les scripts et les docs courants, hors exemptions (adguard, machine `<OLD-SERVER-NAME>`, mots-produits, historique logbook).
-- [ ] Le fonctionnement d'ensemble est vérifié : les deux voies, l'SSH, adguard.
+- [ ] Aucune référence ancienne ne subsiste dans les configurations, les scripts et les docs courants, hors exemptions (la machine `<OLD-SERVER-NAME>`, mots-produits, historique logbook).
+- [ ] Le fonctionnement d'ensemble est vérifié : les deux voies et l'SSH.
 - [ ] Chaque palier est commité et rejouable (les étapes d'un palier se rejouent à l'identique).
 - [ ] Aucune suppression par motif n'a été utilisée.
 
@@ -316,36 +293,9 @@ doas docker exec tunnel-nymvpn nft list chain inet nym forward
 
 ## Les phases restantes
 
-Quatre phases restent ouvertes. [readme.md](readme.md) donne leur état global. Chaque phase a sa tâche ici.
+Deux phases restent ouvertes. [readme.md](readme.md) donne leur état global. Chaque phase a sa tâche ici.
 
-### Le microservice AdGuard Home
-
-#### Objectif
-
-Ajouter le microservice AdGuard Home. Ses sources existent déjà, avec `adguard/verif.sh`. Elles ne sont pas déployées sur le serveur.
-
-#### Conditions
-
-Le résolveur AdGuard dépend de l'arbitrage DNS en cours. Le mode d'accès du service est défini avant le déploiement.
-
-#### Étapes
-
-- [ ] Définissez le mode d'accès du service avant toute installation.
-- [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
-- [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
-- [ ] Définissez la sortie sur `exit-direct`, `exit-nymvpn` ou `none`.
-- [ ] Changez la sortie avec [maintenance.md](maintenance.md), section « La sortie d'un microservice ».
-- [ ] Suivez le gabarit de la phase C en annexe.
-- [ ] Vérifiez le fonctionnement du service après son déploiement.
-
-#### Critères de réussite
-
-- [ ] AdGuard Home est déployé.
-- [ ] Le service possède un mode d'accès défini.
-- [ ] La sortie du service correspond au choix.
-- [ ] Les critères dépendent du mode d'accès retenu.
-
-#### Annexe : le gabarit de la phase C
+### Le gabarit d'un microservice
 
 Pour chaque service à ajouter, définissez d'abord le mode d'accès. Un conteneur compagnon fournit une identité Tailscale propre au service. Le schéma présente l'option d'un accès Tailscale indépendant.
 
@@ -365,7 +315,7 @@ Pour ajouter un service, appliquez les règles de [guidelines.md](guidelines.md)
 
 Définissez alors la sortie sur `exit-direct`, `exit-nymvpn` ou `none`. Pour vérifier la sortie et la changer en service, utilisez [maintenance.md](maintenance.md), section « La sortie d'un microservice ». Les critères de réussite dépendent du mode d'accès retenu.
 
-Le choix du résolveur AdGuard attend l'arbitrage de la section « Les étapes communes ». Le drapeau `--accept-routes=true` permet au compagnon de suivre la route de l'exit node. Le changement de sortie utilise `tailscale set` et conserve le conteneur.
+Le drapeau `--accept-routes=true` permet au compagnon de suivre la route de l'exit node. Le changement de sortie utilise `tailscale set` et conserve le conteneur.
 
 ### Le microservice WoL
 
@@ -383,7 +333,7 @@ L'ordinateur à réveiller reste allumé sur le réseau local ou admet le révei
 - [ ] Appliquez les règles de [guidelines.md](guidelines.md), section « La configuration des microservices ».
 - [ ] Ajoutez un conteneur compagnon si le service a besoin d'une adresse propre.
 - [ ] Définissez la sortie sur `exit-direct`, `exit-nymvpn` ou `none`.
-- [ ] Suivez le gabarit de la phase C en annexe.
+- [ ] Suivez le gabarit de la section « Le gabarit d'un microservice ».
 - [ ] Réservez l'adresse IP du serveur sur le réseau local. La réservation ne sert qu'au jour du WoL.
 - [ ] Vérifiez le réveil d'un ordinateur après le déploiement.
 
