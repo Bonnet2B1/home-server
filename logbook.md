@@ -574,7 +574,7 @@ Correction du jour : `check_message` passe par les mêmes contrôles que l'index
 
 ## L'abandon du filtrage DNS, 2026-10-12
 
-Le filtrage publicitaire au niveau DNS est abandonné. La conception prévoyait un résolveur AdGuard Home sur le serveur, déclaré en nameserver global du tailnet, avec un conteneur compagnon Tailscale et un amont en DoT ou DoH.
+Le filtrage publicitaire au niveau DNS est abandonné. La conception prévoyait un résolveur AdGuard Home sur le serveur. Il devait être nameserver global du tailnet, servi par un conteneur compagnon, avec un amont en DoT ou DoH.
 
 L'utilisateur a demandé l'abandon le 2026-10-12. La conception reposait sur une chaîne de décisions prises avant la compréhension du mécanisme DNS. Une fois ce trajet compris, l'utilisateur a jugé cette chaîne bâtie sur des réponses données sans connaissance, donc sans valeur. Il a préféré l'effacer plutôt que la poursuivre.
 
@@ -592,4 +592,8 @@ Ce qui a été conservé et détaché d'AdGuard, car une autre tâche s'en sert 
 
 Rien n'a été retiré du serveur. AdGuard Home n'a jamais été déployé et `verif.sh` n'a jamais été exécuté. Aucun conteneur, volume, image ni nœud de tailnet ne porte ce nom.
 
-Les décisions antérieures qui portaient sur AdGuard restent consignées comme historique : la ligne du tableau « Les choix technologiques » (AdGuard Home, phase C) et la ligne « DNS » des « décisions actées ». Elles sont caduques à compter de cette date.
+Les décisions antérieures sur AdGuard restent consignées comme historique. Elles portent sur la ligne « DNS » des « décisions actées » et sur la ligne « AdGuard Home, phase C » du tableau « Les choix technologiques ». Elles sont caduques à compter de cette date.
+
+## L'audit de l'abandon, 2026-10-13
+
+Quatre sous-agents ont audité l'abandon du filtrage DNS en lecture seule. Chaque audit a repris une partie : le dépôt et les commits, le hook et les outils, le logbook, la cohérence des documents. Aucun constat bloquant ni majeur. Deux constats mineurs ont été corrigés : l'effet de bord du filtre sur les changements de type, et deux phrases trop longues. La vérification sur le serveur reste à faire.
